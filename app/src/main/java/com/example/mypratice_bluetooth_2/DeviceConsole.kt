@@ -39,15 +39,9 @@ class DeviceConsole : AppCompatActivity() {
             binding.tvDeviceType.text = bluetoothDevice?.type.toString()
             binding.tvDeviceUUID.text = bluetoothDevice?.uuids.toString()
         }
-        binding.btnServer.setOnClickListener {
+        binding.btnConnect.setOnClickListener {
             btnAction_connect()
         }
-//        binding.btnClient.setOnClickListener {
-//            creatBluetoothClientSocket()
-//        }
-
-
-
 
         setContentView(binding.root)
     }
@@ -59,15 +53,6 @@ class DeviceConsole : AppCompatActivity() {
             }
         }
     }
-
-    fun myServer(){
-        CoroutineScope(Dispatchers.IO).launch {
-            if (ActivityCompat.checkSelfPermission(this@DeviceConsole, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED){
-                val serverSocket: BluetoothServerSocket? = bluetoothAdapter.listenUsingRfcommWithServiceRecord("MY_UUID", MY_UUID)
-            }
-        }
-    }
-
 
     //建立伺服器端
     fun createBluetoothServerSocket(){
@@ -99,7 +84,7 @@ class DeviceConsole : AppCompatActivity() {
     suspend fun createBluetoothServerSocket_2(){
         withContext(Dispatchers.IO){
             Log.d(TAG, "createBluetoothServerSocket: Starting")
-            if (ActivityCompat.checkSelfPermission(this@DeviceConsole,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this@DeviceConsole, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 Log.e(TAG, "createBluetoothServerSocket: Missing BLUETOOTH_CONNECT permission")
                 return@withContext
             }
@@ -116,11 +101,9 @@ class DeviceConsole : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@DeviceConsole, "連線已建立", Toast.LENGTH_SHORT).show()
                 }
-
                 // Here you can start communication with the client
                 // For example, you could call a function to handle the connection:
                 // handleClientConnection(clientSocket)
-
             } catch (e: IOException) {
                 Log.e(TAG, "createBluetoothServerSocket: Error occurred", e)
                 withContext(Dispatchers.Main) {
@@ -136,7 +119,6 @@ class DeviceConsole : AppCompatActivity() {
                 }
             }
         }
-
     }
     //建立客戶端
     fun createBluetoothClientSocket(): Boolean{
