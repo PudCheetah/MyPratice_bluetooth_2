@@ -23,40 +23,36 @@ class BluetoothAction(val context: Context, val bluetoothAdapter: BluetoothAdapt
     }
     //關閉藍芽
     fun disableBluetooth(){
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
         ) {
-            bluetoothAdapter.disable()
-        }else{
             Log.d(TAG, "disableBluetooth: permiss problem")
         }
+        bluetoothAdapter.disable()
     }
 
     //啟動藍芽搜尋
     fun activityScanning(){
-        if(context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED){
-            if(bluetoothAdapter.isDiscovering){
-                Toast.makeText(context, "搜尋已開始", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "activityScanning: Scanning has been started")
-            }else{
-                if(bluetoothAdapter.startDiscovery()){
-                    Toast.makeText(context, "搜尋開始", Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, "activityScanning: start scanning")
-                }else{
-                    Log.d(TAG, "activityScanning: scanning start Fail")
-                }
-            }
-        }else{
+        if(context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED){
             Log.d(TAG, "activityScanning: Permission Problem")
         }
-
+        if(bluetoothAdapter.isDiscovering){
+            Toast.makeText(context, "搜尋已開始", Toast.LENGTH_SHORT).show()
+            Log.d(TAG, "activityScanning: Scanning has been started")
+        }else{
+            if(bluetoothAdapter.startDiscovery()){
+                Toast.makeText(context, "搜尋開始", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "activityScanning: start scanning")
+            }else{
+                Log.d(TAG, "activityScanning: scanning start Fail")
+            }
+        }
     }
     //關閉藍芽搜尋
     fun inactivityScanning(){
-        if(context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED){
-            bluetoothAdapter.cancelDiscovery()
-        }else{
+        if(context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED){
             Log.d(TAG, "inactivityScanning: permission problem")
         }
+        bluetoothAdapter.cancelDiscovery()
     }
 
     //使裝置進入可被搜尋狀態

@@ -43,19 +43,17 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
     }
     fun broadcastAction_ACTION_FOUND(intent: Intent){
         val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-        if (ActivityCompat.checkSelfPermission(context,Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED){
-            val deviceName = device?.name
-            val deviceAddress = device?.address
-            val deviceType = device?.type
-            val deviceUUID = device?.uuids.toString()
-            val deviceInfo = BluetoothDeviceInfo(deviceName, deviceAddress, deviceType, deviceUUID)
-            viewModel.addDevice(deviceInfo)
-            Log.d(TAG, "ACTION_FOUND: ${deviceName}: ${deviceAddress}")
-            Log.d(TAG, "broadcastAction_ACTION_FOUND(ViewModel): ${viewModel.scannedDevices.value}")
-        }else{
+        if (ActivityCompat.checkSelfPermission(context,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "broadcastAction_ACTION_FOUND: permission problem")
         }
-
+        val deviceName = device?.name
+        val deviceAddress = device?.address
+        val deviceType = device?.type
+        val deviceUUID = device?.uuids.toString()
+        val deviceInfo = BluetoothDeviceInfo(deviceName, deviceAddress, deviceType, deviceUUID)
+        viewModel.addDevice(deviceInfo)
+        Log.d(TAG, "ACTION_FOUND: ${deviceName}: ${deviceAddress}")
+        Log.d(TAG, "broadcastAction_ACTION_FOUND(ViewModel): ${viewModel.scannedDevices.value}")
     }
     fun broadcastAction_ACTION_DISCOVERY_STARTED(){
         Toast.makeText(context, "Discovery started", Toast.LENGTH_LONG).show()
