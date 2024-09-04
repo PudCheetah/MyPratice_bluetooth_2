@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,11 +32,12 @@ class DeviceConsole : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val deviceInfo = intent.getParcelableExtra<BluetoothDeviceInfo>("DeviceInfo")
+        val deviceInfo = intent.getParcelableExtra<DataClass_BluetoothDeviceInfo>("DeviceInfo")
         bluetoothAdapter = MyBluetoothManager.bluetoothAdapter
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceInfo?.deviceAddress)
         binding = ActivityDeviceConsoleBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this).get(Viewmodel_DeviceConsole::class.java)
+        rvSet()
 
         if (ActivityCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
             binding.tvDeviceName.text = bluetoothDevice?.name
@@ -49,11 +51,13 @@ class DeviceConsole : AppCompatActivity() {
         binding.btnSendMessage.setOnClickListener {
             btnAction_sendMessage()
         }
-        viewModel.textReceiveList.observe(this){
-            if(viewModel.textReceiveList.value?.size != 0){
-                Toast.makeText(this, "${viewModel.textReceiveList.value?.last()}", Toast.LENGTH_SHORT).show()
+        viewModel.textMessageList.observe(this){
+            if(viewModel.textMessageList.value?.size != 0){
+                Toast.makeText(this, "${viewModel.textMessageList.value?.last()}", Toast.LENGTH_SHORT).show()
             }
-
+            binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
+//            rvSet()
+            binding.root.invalidate()
         }
         setContentView(binding.root)
     }
@@ -161,6 +165,9 @@ class DeviceConsole : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val outputStream = socket?.outputStream
+                withContext(Dispatchers.Main){
+                    viewModel.addToMessageList(null, null, message)
+                }
                 outputStream?.write(message.toByteArray())
                 outputStream?.flush()
                 Log.d(TAG, "Message sent: $message")
@@ -173,26 +180,34 @@ class DeviceConsole : AppCompatActivity() {
     fun receiveMessages(socket: BluetoothSocket?) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                if (ActivityCompat.checkSelfPermission(this@DeviceConsole,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "receiveMessages: Permission Problem")
+                }
                 withContext(Dispatchers.Main){
                     Toast.makeText(this@DeviceConsole, "開始監聽", Toast.LENGTH_SHORT).show()
                 }
                 val inputStream = socket?.inputStream
+                val deviceName = socket?.remoteDevice?.name ?: "unknow"
                 val buffer = ByteArray(1024) // 用來存儲接收的數據
                 while (isActive) {
                     // 從輸入流中讀取數據
                     val bytes = inputStream?.read(buffer)
                     val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
                     Log.d(TAG, "Message received: $message")
-                    if (message != null) {
+                    message?.also {
                         withContext(Dispatchers.Main){
-                            viewModel.addToReceiveList(message)
+                            viewModel.addToMessageList(deviceName, null, message)
+                            Log.d(TAG, "receiveMessages: ${viewModel.textMessageList.value}")
                         }
-
                     }
                 }
             } catch (e: IOException) {
                 Log.e(TAG, "Error receiving message", e)
             }
         }
+    }
+    fun rvSet(){
+        binding.rvDeviceConsole.layoutManager = LinearLayoutManager(this)
+        binding.rvDeviceConsole.adapter = RvAdapter_deviceConsole(viewModel)
     }
 }

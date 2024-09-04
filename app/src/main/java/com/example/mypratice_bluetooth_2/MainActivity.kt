@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
     fun rvSet(){
         binding.rvMainActivity.layoutManager = LinearLayoutManager(this)
-        binding.rvMainActivity.adapter = MyRvAdapter(this, viewModel, intentLauncher)
+        binding.rvMainActivity.adapter = RvAdapter_mainActivity(this, viewModel, intentLauncher)
     }
     fun switchInitSet(){
         binding.switch1.isChecked = bluetoothAdapter.isEnabled

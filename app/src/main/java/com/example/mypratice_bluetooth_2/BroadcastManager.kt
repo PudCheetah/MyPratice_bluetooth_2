@@ -12,7 +12,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModel
 
 class BroadcastManager(val context: Context, val activity: AppCompatActivity, val viewModel: ViewModel_MainActivity) {
     private val TAG = "MyTag" + BroadcastManager::class.java.simpleName
@@ -50,7 +49,7 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
         val deviceAddress = device?.address
         val deviceType = device?.type
         val deviceUUID = device?.uuids.toString()
-        val deviceInfo = BluetoothDeviceInfo(deviceName, deviceAddress, deviceType, deviceUUID)
+        val deviceInfo = DataClass_BluetoothDeviceInfo(deviceName, deviceAddress, deviceType, deviceUUID)
         viewModel.addDevice(deviceInfo)
         Log.d(TAG, "ACTION_FOUND: ${deviceName}: ${deviceAddress}")
         Log.d(TAG, "broadcastAction_ACTION_FOUND(ViewModel): ${viewModel.scannedDevices.value}")

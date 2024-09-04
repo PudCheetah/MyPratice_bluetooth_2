@@ -10,7 +10,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +30,7 @@ class DeviceConsole_2 : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val deviceInfo = intent.getParcelableExtra<BluetoothDeviceInfo>("DeviceInfo")
+        val deviceInfo = intent.getParcelableExtra<DataClass_BluetoothDeviceInfo>("DeviceInfo")
         bluetoothAdapter = MyBluetoothManager.bluetoothAdapter
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceInfo?.deviceAddress)
         binding = ActivityDeviceConsoleBinding.inflate(layoutInflater)

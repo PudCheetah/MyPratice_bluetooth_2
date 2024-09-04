@@ -1,16 +1,14 @@
 package com.example.mypratice_bluetooth_2
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mypratice_bluetooth_2.databinding.RvItemBinding
+import com.example.mypratice_bluetooth_2.databinding.RvItemMainActivityBinding
 
-class MyRvAdapter(val context: Context, val viewModel: ViewModel_MainActivity, val intentLauncher: IntentLauncher): RecyclerView.Adapter<MyRvAdapter.MyRvHolder>() {
-    inner class MyRvHolder(itemView: RvItemBinding): RecyclerView.ViewHolder(itemView.root){
+class RvAdapter_mainActivity(val context: Context, val viewModel: ViewModel_MainActivity, val intentLauncher: IntentLauncher): RecyclerView.Adapter<RvAdapter_mainActivity.MyRvHolder>() {
+    inner class MyRvHolder(itemView: RvItemMainActivityBinding): RecyclerView.ViewHolder(itemView.root){
         val tvDeviceName = itemView.tvDeviceName
         val tvDeviceAddress = itemView.tvDeviceAddress
         val tvDeviceType = itemView.tvDeviceType
@@ -19,7 +17,7 @@ class MyRvAdapter(val context: Context, val viewModel: ViewModel_MainActivity, v
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRvHolder {
-        return MyRvHolder(RvItemBinding.inflate(LayoutInflater.from(parent.context)))
+        return MyRvHolder(RvItemMainActivityBinding.inflate(LayoutInflater.from(parent.context)))
     }
 
     override fun getItemCount(): Int {
@@ -35,7 +33,7 @@ class MyRvAdapter(val context: Context, val viewModel: ViewModel_MainActivity, v
             tvDeviceType.text = deviceList?.get(position)?.deviceType?.toString() ?: "unknow deviceType"
             tvDeviceUUID.text = deviceList?.get(position)?.deviceUUID ?: "unknow deviceUUID"
             rv_item_constraintLayout.setOnClickListener {
-                val deviceInfo = BluetoothDeviceInfo(
+                val deviceInfo = DataClass_BluetoothDeviceInfo(
                     deviceList?.get(position)?.deviceName ?: "unknow deviceName",
                     deviceList?.get(position)?.deviceAddress ?: "unknow deviceAddress",
                     deviceList?.get(position)?.deviceType ?: 0,

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class BluetoothDeviceInfo(
+data class DataClass_BluetoothDeviceInfo(
     val deviceName: String ?= "unknow Name",
     val deviceAddress: String?= "unKnow Address",
     val deviceType: Int?= 404,
@@ -17,7 +17,7 @@ data class BluetoothDeviceInfo(
             if(this.javaClass != other?.javaClass){
                 return false
             }else{
-                other as BluetoothDeviceInfo
+                other as DataClass_BluetoothDeviceInfo
                 return (this.deviceAddress == other.deviceAddress)
             }
         }

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class ViewModel_MainActivity: ViewModel() {
-    var scannedDevices = MutableLiveData<MutableSet<BluetoothDeviceInfo>>()
+    var scannedDevices = MutableLiveData<MutableSet<DataClass_BluetoothDeviceInfo>>()
     var scannedDevices_2 = MutableLiveData<MutableSet<BluetoothDevice>>()
     var switchStatu = MutableLiveData<Boolean>()
 
@@ -14,7 +14,7 @@ class ViewModel_MainActivity: ViewModel() {
         switchStatu.value = false
     }
 
-    fun addDevice(deviceInfo: BluetoothDeviceInfo){
+    fun addDevice(deviceInfo: DataClass_BluetoothDeviceInfo){
         scannedDevices.value?.add(deviceInfo)
         scannedDevices.value = scannedDevices.value
     }
