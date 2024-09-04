@@ -1,5 +1,4 @@
 package com.example.mypratice_bluetooth_2
-
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -22,7 +21,7 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
 
-class DeviceConsole : AppCompatActivity() {
+class DeviceConsole_2 : AppCompatActivity() {
     private val TAG = "MyTag" + DeviceConsole::class.java.simpleName
     private lateinit var binding: ActivityDeviceConsoleBinding
     private lateinit var bluetoothAdapter: BluetoothAdapter
@@ -47,15 +46,15 @@ class DeviceConsole : AppCompatActivity() {
         binding.btnConnect.setOnClickListener {
             btnAction_connect()
         }
-        binding.btnSendMessage.setOnClickListener {
-            btnAction_sendMessage()
-        }
-        viewModel.textList.observe(this){
-            if(viewModel.textList.value?.size != 0){
-                Toast.makeText(this, "${viewModel.textList.value?.last()}", Toast.LENGTH_SHORT).show()
-            }
+//        binding.btnSendMessage.setOnClickListener {
+//            if (binding.etMessageInput.text?.isNotEmpty() == true){
+//                val string = binding.etMessageInput.text.toString()
+//                sendMessage(viewModel.connectSocket.value, string)
+//            }else{
+//                Toast.makeText(this, "錯誤訊息不可為空", Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
-        }
         setContentView(binding.root)
     }
 
@@ -65,90 +64,136 @@ class DeviceConsole : AppCompatActivity() {
 
             }else{
                 withContext(Dispatchers.Main){
-                    Toast.makeText(this@DeviceConsole, "嘗試建立伺服器", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@DeviceConsole_2, "嘗試建立伺服器", Toast.LENGTH_SHORT).show()
                 }
                 createBluetoothServerSocket_2()
             }
-            receiveMessages(viewModel.connectSocket.value)
-        }
-    }
-    fun btnAction_sendMessage(){
-        if(binding.etMessageInput.text?.isEmpty() == true){
-            Toast.makeText(this, "不可傳送空白訊息", Toast.LENGTH_SHORT).show()
-        }else{
-            val message = binding.etMessageInput.text.toString()
-            sendMessage(viewModel.connectSocket.value, message)
-            binding.etMessageInput.text?.clear()
+//            receiveMessages(viewModel.connectSocket.value)
         }
     }
 
-
-
-
+    //建立伺服器端
+    fun createBluetoothServerSocket(){
+        CoroutineScope(Dispatchers.IO).launch {
+            if (ActivityCompat.checkSelfPermission(this@DeviceConsole_2, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                val serverSocket: BluetoothServerSocket? = bluetoothAdapter.listenUsingRfcommWithServiceRecord("MY_UUID", MY_UUID)
+                var shouldLoop = true
+                while (shouldLoop) {
+                    val socket: BluetoothSocket? = try {
+                        serverSocket?.accept()
+                    } catch (e: IOException) {
+                        Log.e(TAG, "Socket's accept() method failed", e)
+                        shouldLoop = false
+                        null
+                    }
+                    socket?.also {
+                        withContext(Dispatchers.Main){
+                            Toast.makeText(this@DeviceConsole_2, "連線已建立", Toast.LENGTH_SHORT).show()
+                        }
+                        Log.d(TAG, "creatBluetoothServerSocket: 連線已建立")
+                        serverSocket?.close()
+                        shouldLoop = false
+                    }
+                }
+            }
+        }
+    }
     //建立伺服器端(優畫板)
     suspend fun createBluetoothServerSocket_2(){
         withContext(Dispatchers.IO){
             Log.d(TAG, "createBluetoothServerSocket: Starting")
-            if (ActivityCompat.checkSelfPermission(this@DeviceConsole, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this@DeviceConsole_2, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 Log.e(TAG, "createBluetoothServerSocket: Missing BLUETOOTH_CONNECT permission")
                 return@withContext
             }
             var serverSocket: BluetoothServerSocket? = null
             var clientSocket: BluetoothSocket? = null
+
             try {
                 serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("MY_UUID", MY_UUID)
                 Log.d(TAG, "createBluetoothServerSocket: Listening for connections")
                 serverSocket?.also {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@DeviceConsole, "成功建立伺服器", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DeviceConsole_2, "成功建立伺服器", Toast.LENGTH_SHORT).show()
                     }
                 }
                 clientSocket = serverSocket.accept()
-                viewModel.connectSocket.postValue(clientSocket)
+                viewModel.connectSocket.value = clientSocket
                 Log.d(TAG, "createBluetoothServerSocket: Connection accepted")
                 clientSocket?.also {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@DeviceConsole, "成功連接", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DeviceConsole_2, "成功連接", Toast.LENGTH_SHORT).show()
                     }
                 }
+
+                // Here you can start communication with the client
+                // For example, you could call a function to handle the connection:
+                // handleClientConnection(clientSocket)
             } catch (e: IOException) {
                 Log.e(TAG, "createBluetoothServerSocket: Error occurred", e)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DeviceConsole, "伺服器端口建立失敗", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@DeviceConsole_2, "伺服器端口建立失敗", Toast.LENGTH_SHORT).show()
                 }
             } finally {
                 // Clean up the connection
-//                try {
-//                    serverSocket?.close()
-//                    clientSocket?.close()
-//                } catch (e: IOException) {
-//                    Log.e(TAG, "createBluetoothServerSocket: Error closing sockets", e)
-//                }
+                try {
+                    serverSocket?.close()
+                    clientSocket?.close()
+                } catch (e: IOException) {
+                    Log.e(TAG, "createBluetoothServerSocket: Error closing sockets", e)
+                }
             }
         }
     }
-
+    //建立客戶端
+    fun createBluetoothClientSocket(): Boolean{
+        Log.d(TAG, "creatBluetoothClientSocket: creatBluetoothClientSocket()")
+        var isSocket = false
+        CoroutineScope(Dispatchers.IO).launch {
+            if (ActivityCompat.checkSelfPermission(this@DeviceConsole_2,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                Log.e(TAG, "createBluetoothClientSocket: Missing BLUETOOTH_CONNECT permission")
+            }else{
+                val socket: BluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID)
+                if(socket != null){
+                    try {
+                        socket.connect()
+                        viewModel.connectSocket.value = socket
+                        withContext(Dispatchers.Main){
+                            Toast.makeText(this@DeviceConsole_2, "成功連接至伺服器", Toast.LENGTH_SHORT).show()
+                        }
+                        Log.d(TAG, "creatBluetoothClientSocket: 成功連接至伺服器")
+                    }catch (e: IOException){
+                        withContext(Dispatchers.Main){
+                            Toast.makeText(this@DeviceConsole_2, "連接失敗", Toast.LENGTH_SHORT).show()
+                        }
+                        Log.d(TAG, "creatBluetoothClientSocket: 連接失敗")
+                    }
+                    isSocket = true
+                }
+            }
+        }
+        return isSocket
+    }
     //建立客戶端(優化板)
     suspend fun createBluetoothClientSocket_2(): Boolean{
         return withContext(Dispatchers.IO){
             Log.d(TAG, "createBluetoothClientSocket: Starting")
-            if (ActivityCompat.checkSelfPermission(this@DeviceConsole,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this@DeviceConsole_2,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 Log.e(TAG, "createBluetoothClientSocket: Missing BLUETOOTH_CONNECT permission")
                 return@withContext false
             }
             try {
                 val socket: BluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID)
                 socket.connect()
-                viewModel.connectSocket.postValue(socket)
                 Log.d(TAG, "createBluetoothClientSocket: Connection successful")
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DeviceConsole, "連接成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@DeviceConsole_2, "連接成功", Toast.LENGTH_SHORT).show()
                 }
                 true
             } catch (e: IOException) {
                 Log.e(TAG, "createBluetoothClientSocket: Connection failed", e)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DeviceConsole, "連接失敗", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@DeviceConsole_2, "連接失敗", Toast.LENGTH_SHORT).show()
                 }
                 false
             }
@@ -174,9 +219,6 @@ class DeviceConsole : AppCompatActivity() {
     fun receiveMessages(socket: BluetoothSocket?) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                withContext(Dispatchers.Main){
-                    Toast.makeText(this@DeviceConsole, "開始監聽", Toast.LENGTH_SHORT).show()
-                }
                 val inputStream = socket?.inputStream
                 val buffer = ByteArray(1024) // 用來存儲接收的數據
                 while (isActive) {
@@ -184,12 +226,6 @@ class DeviceConsole : AppCompatActivity() {
                     val bytes = inputStream?.read(buffer)
                     val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
                     Log.d(TAG, "Message received: $message")
-                    if (message != null) {
-                        withContext(Dispatchers.Main){
-                            viewModel.addToTextList(message)
-                        }
-
-                    }
                 }
             } catch (e: IOException) {
                 Log.e(TAG, "Error receiving message", e)
