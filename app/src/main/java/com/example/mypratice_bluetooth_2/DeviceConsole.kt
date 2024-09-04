@@ -11,7 +11,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
@@ -50,9 +49,9 @@ class DeviceConsole : AppCompatActivity() {
         binding.btnSendMessage.setOnClickListener {
             btnAction_sendMessage()
         }
-        viewModel.textList.observe(this){
-            if(viewModel.textList.value?.size != 0){
-                Toast.makeText(this, "${viewModel.textList.value?.last()}", Toast.LENGTH_SHORT).show()
+        viewModel.textReceiveList.observe(this){
+            if(viewModel.textReceiveList.value?.size != 0){
+                Toast.makeText(this, "${viewModel.textReceiveList.value?.last()}", Toast.LENGTH_SHORT).show()
             }
 
         }
@@ -186,7 +185,7 @@ class DeviceConsole : AppCompatActivity() {
                     Log.d(TAG, "Message received: $message")
                     if (message != null) {
                         withContext(Dispatchers.Main){
-                            viewModel.addToTextList(message)
+                            viewModel.addToReceiveList(message)
                         }
 
                     }
