@@ -50,9 +50,10 @@ class MainActivity : AppCompatActivity() {
                 bluetoothAction.disableBluetooth()
             }
         }
-        binding.floatingActionButton3.setOnClickListener { btnAction_activityScanning() }
-        binding.floatingActionButton4.setOnClickListener { btnAction_changeBluetoothMode_discoverable() }
-
+        binding.floatingActionButton3.setOnClickListener {
+            btnAction_activityScanning()
+            btnAction_changeBluetoothMode_discoverable()
+        }
     }
 
     fun permissionArray(): Array<String>{

@@ -76,13 +76,18 @@ class DeviceConsole : AppCompatActivity() {
         }
     }
     fun btnAction_sendMessage(){
-        if(binding.etMessageInput.text?.isEmpty() == true){
-            Toast.makeText(this, "不可傳送空白訊息", Toast.LENGTH_SHORT).show()
+        if(viewModel.connectSocket.value != null){
+            if(binding.etMessageInput.text?.isEmpty() == true){
+                Toast.makeText(this, "不可傳送空白訊息", Toast.LENGTH_SHORT).show()
+            }else{
+                val message = binding.etMessageInput.text.toString()
+                sendMessage(viewModel.connectSocket.value, message)
+                binding.etMessageInput.text?.clear()
+            }
         }else{
-            val message = binding.etMessageInput.text.toString()
-            sendMessage(viewModel.connectSocket.value, message)
-            binding.etMessageInput.text?.clear()
+            Toast.makeText(this, "連線尚未建立", Toast.LENGTH_SHORT).show()
         }
+
     }
 
 

@@ -6,18 +6,26 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <TextView
+        android:id="@+id/tv_source"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="訊息來源"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_1_rvitem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="5dp"
         android:background="#03A9F4"
         app:cardCornerRadius="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/tv_source">
 
         <TextView
             android:id="@+id/tv_1_rvItem"
@@ -26,4 +34,5 @@
             android:background="#4F03A9F4"
             android:text="TextView" />
     </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
