@@ -44,5 +44,8 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
             }
         }
     }
+    fun getViewmodelInitJob(): Job{
+        return viewModelInitJob
+    }
 
 }

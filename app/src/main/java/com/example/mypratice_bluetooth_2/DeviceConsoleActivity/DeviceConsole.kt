@@ -3,8 +3,6 @@ package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothServerSocket
-import android.bluetooth.BluetoothSocket
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -20,10 +18,9 @@ import com.example.mypratice_bluetooth_2.MyBluetoothManager
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.util.UUID
 
 class DeviceConsole : AppCompatActivity() {
@@ -66,9 +63,13 @@ class DeviceConsole : AppCompatActivity() {
         binding.tvDeviceAddress.text = bluetoothDevice?.address
         binding.tvDeviceType.text = bluetoothDevice?.type.toString()
         binding.tvDeviceUUID.text = bluetoothDevice?.uuids.toString()
-        rvSet()
+        rvInitSet()
         switchInitSet()
-        listenterAndObserve_set()
+        CoroutineScope(Dispatchers.Main).launch {
+            joinAll(viewModel.getViewmodelInitJob())
+            listenterAndObserve_set()
+        }
+
 
     }
     fun listenterAndObserve_set(){
@@ -90,7 +91,11 @@ class DeviceConsole : AppCompatActivity() {
                 Toast.makeText(this, "${viewModel.textMessageList.value?.last()}", Toast.LENGTH_SHORT).show()
             }
             binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
+            CoroutineScope(Dispatchers.Main).launch{
+                binding.rvDeviceConsole.scrollToPosition((viewModel.textMessageList.value!!.size - 1))
+            }
             binding.root.invalidate()
+
         }
     }
 
@@ -127,7 +132,7 @@ class DeviceConsole : AppCompatActivity() {
         }
     }
 
-    fun rvSet(){
+    fun rvInitSet(){
         binding.rvDeviceConsole.layoutManager = LinearLayoutManager(this)
         binding.rvDeviceConsole.adapter = RvAdapter_deviceConsole(viewModel)
     }
