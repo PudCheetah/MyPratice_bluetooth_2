@@ -1,12 +1,11 @@
-package com.example.mypratice_bluetooth_2
+package com.example.mypratice_bluetooth_2.MainActivity
 
-import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.mypratice_bluetooth_2.Database.DataClass_BluetoothDeviceInfo
 
 class ViewModel_MainActivity: ViewModel() {
     var scannedDevices = MutableLiveData<MutableSet<DataClass_BluetoothDeviceInfo>>()
-    var scannedDevices_2 = MutableLiveData<MutableSet<BluetoothDevice>>()
     var switchStatu = MutableLiveData<Boolean>()
 
     init {

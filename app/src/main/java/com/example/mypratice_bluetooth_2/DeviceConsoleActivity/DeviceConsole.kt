@@ -1,4 +1,4 @@
-package com.example.mypratice_bluetooth_2
+package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -13,6 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mypratice_bluetooth_2.BluetoothAction
+import com.example.mypratice_bluetooth_2.Database.DataClass_BluetoothDeviceInfo
+import com.example.mypratice_bluetooth_2.IntentLauncher
+import com.example.mypratice_bluetooth_2.MyBluetoothManager
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +32,8 @@ class DeviceConsole : AppCompatActivity() {
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private lateinit var bluetoothDevice: BluetoothDevice
     private lateinit var viewModel: Viewmodel_DeviceConsole
+    private lateinit var intentLauncher: IntentLauncher
+    private lateinit var bluetoothAction: BluetoothAction
     private val MY_UUID: UUID = UUID.fromString("12345678-1234-1234-1234-123456789abc")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +42,11 @@ class DeviceConsole : AppCompatActivity() {
         bluetoothAdapter = MyBluetoothManager.bluetoothAdapter
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceInfo?.deviceAddress)
         binding = ActivityDeviceConsoleBinding.inflate(layoutInflater)
+        intentLauncher = IntentLauncher(this)
         viewModel = ViewModelProvider(this).get(Viewmodel_DeviceConsole::class.java)
+        bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
         rvSet()
+        switchInitSet()
 
         if (ActivityCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
             binding.tvDeviceName.text = bluetoothDevice?.name
@@ -51,15 +60,27 @@ class DeviceConsole : AppCompatActivity() {
         binding.btnSendMessage.setOnClickListener {
             btnAction_sendMessage()
         }
+        binding.switch1.setOnCheckedChangeListener { buttonView, isCheck ->
+            if(isCheck){
+                bluetoothAction.enableBluetooth()
+            }else{
+                bluetoothAction.disableBluetooth()
+            }
+        }
         viewModel.textMessageList.observe(this){
             if(viewModel.textMessageList.value?.size != 0){
                 Toast.makeText(this, "${viewModel.textMessageList.value?.last()}", Toast.LENGTH_SHORT).show()
             }
             binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
-//            rvSet()
             binding.root.invalidate()
         }
         setContentView(binding.root)
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.addToDatabase()
     }
 
     fun btnAction_connect(){
@@ -76,18 +97,21 @@ class DeviceConsole : AppCompatActivity() {
         }
     }
     fun btnAction_sendMessage(){
-        if(viewModel.connectSocket.value != null){
-            if(binding.etMessageInput.text?.isEmpty() == true){
-                Toast.makeText(this, "不可傳送空白訊息", Toast.LENGTH_SHORT).show()
+        if(bluetoothAdapter.isEnabled){
+            if(viewModel.connectSocket.value != null){
+                if(binding.etMessageInput.text?.isEmpty() == true){
+                    Toast.makeText(this, "不可傳送空白訊息", Toast.LENGTH_SHORT).show()
+                }else{
+                    val message = binding.etMessageInput.text.toString()
+                    sendMessage(viewModel.connectSocket.value, message)
+                    binding.etMessageInput.text?.clear()
+                }
             }else{
-                val message = binding.etMessageInput.text.toString()
-                sendMessage(viewModel.connectSocket.value, message)
-                binding.etMessageInput.text?.clear()
+                Toast.makeText(this, "連線尚未建立", Toast.LENGTH_SHORT).show()
             }
         }else{
-            Toast.makeText(this, "連線尚未建立", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "請先開啟藍芽", Toast.LENGTH_SHORT).show()
         }
-
     }
 
 
@@ -171,7 +195,8 @@ class DeviceConsole : AppCompatActivity() {
             try {
                 val outputStream = socket?.outputStream
                 withContext(Dispatchers.Main){
-                    viewModel.addToMessageList(null, null, message)
+                    val address = socket?.remoteDevice?.address
+                    viewModel.addToMessageList(address, null, null, message)
                 }
                 outputStream?.write(message.toByteArray())
                 outputStream?.flush()
@@ -192,7 +217,9 @@ class DeviceConsole : AppCompatActivity() {
                     Toast.makeText(this@DeviceConsole, "開始監聽", Toast.LENGTH_SHORT).show()
                 }
                 val inputStream = socket?.inputStream
-                val deviceName = socket?.remoteDevice?.name ?: "unknow"
+                val deviceInfo = socket?.remoteDevice
+                val deviceAddress = deviceInfo?.address ?: "unknow"
+                val deviceName = deviceInfo?.name ?: "unknow"
                 val buffer = ByteArray(1024) // 用來存儲接收的數據
                 while (isActive) {
                     // 從輸入流中讀取數據
@@ -201,7 +228,7 @@ class DeviceConsole : AppCompatActivity() {
                     Log.d(TAG, "Message received: $message")
                     message?.also {
                         withContext(Dispatchers.Main){
-                            viewModel.addToMessageList(deviceName, null, message)
+                            viewModel.addToMessageList(deviceAddress, deviceName, null, message)
                             Log.d(TAG, "receiveMessages: ${viewModel.textMessageList.value}")
                         }
                     }
@@ -214,5 +241,8 @@ class DeviceConsole : AppCompatActivity() {
     fun rvSet(){
         binding.rvDeviceConsole.layoutManager = LinearLayoutManager(this)
         binding.rvDeviceConsole.adapter = RvAdapter_deviceConsole(viewModel)
+    }
+    fun switchInitSet(){
+        binding.switch1.isChecked = bluetoothAdapter.isEnabled
     }
 }

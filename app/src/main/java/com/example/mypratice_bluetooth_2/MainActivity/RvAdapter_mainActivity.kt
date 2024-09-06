@@ -1,10 +1,13 @@
-package com.example.mypratice_bluetooth_2
+package com.example.mypratice_bluetooth_2.MainActivity
 
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mypratice_bluetooth_2.Database.DataClass_BluetoothDeviceInfo
+import com.example.mypratice_bluetooth_2.DeviceConsoleActivity.DeviceConsole
+import com.example.mypratice_bluetooth_2.IntentLauncher
 import com.example.mypratice_bluetooth_2.databinding.RvItemMainActivityBinding
 
 class RvAdapter_mainActivity(val context: Context, val viewModel: ViewModel_MainActivity, val intentLauncher: IntentLauncher): RecyclerView.Adapter<RvAdapter_mainActivity.MyRvHolder>() {

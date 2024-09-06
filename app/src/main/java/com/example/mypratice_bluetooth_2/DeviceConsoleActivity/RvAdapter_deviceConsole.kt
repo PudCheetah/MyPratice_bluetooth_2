@@ -1,10 +1,9 @@
-package com.example.mypratice_bluetooth_2
+package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mypratice_bluetooth_2.databinding.RvItemDeviceConsoleBinding
@@ -13,7 +12,6 @@ class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerV
     inner class MyViewHolder(itemView: RvItemDeviceConsoleBinding): RecyclerView.ViewHolder(itemView.root){
         val tv_1_rvItem = itemView.tv1RvItem
         val cv_1_rvitem= itemView.cv1Rvitem
-        val CSL_1_rvitem = itemView.CSL1Rvitem
         val tv_source = itemView.tvSource
     }
 
@@ -29,7 +27,7 @@ class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerV
         holder.itemView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         with(holder){
             val messageInfo = viewModel.textMessageList.value?.get(position)
-            if(messageInfo?.source == "local"){
+            if(messageInfo?.sourceName == "local"){
                 //變更顏色
                 tv_1_rvItem.setBackgroundColor(Color.GREEN)
                 // 置右
@@ -43,7 +41,7 @@ class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerV
                 CL_set_2(tv_source, (0).toFloat())
             }
             tv_1_rvItem.text = messageInfo?.message
-            tv_source.text = messageInfo?.source
+            tv_source.text = messageInfo?.sourceName
         }
     }
     //按照percent(0-1)的比例來變更view的水平位置

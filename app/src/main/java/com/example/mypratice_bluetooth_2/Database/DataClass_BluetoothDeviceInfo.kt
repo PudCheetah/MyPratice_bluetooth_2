@@ -1,4 +1,4 @@
-package com.example.mypratice_bluetooth_2
+package com.example.mypratice_bluetooth_2.Database
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

@@ -1,4 +1,4 @@
-package com.example.mypratice_bluetooth_2
+package com.example.mypratice_bluetooth_2.MainActivity
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -9,6 +9,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mypratice_bluetooth_2.BluetoothAction
+import com.example.mypratice_bluetooth_2.BroadcastManager
+import com.example.mypratice_bluetooth_2.IntentLauncher
+import com.example.mypratice_bluetooth_2.MyBluetoothManager
 import com.example.mypratice_bluetooth_2.databinding.ActivityMainBinding
 
 
