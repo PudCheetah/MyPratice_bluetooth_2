@@ -15,7 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(application) {
-    private val TAG = "MyTagViewModel" + Viewmodel_DeviceConsole::class.java
+    private val TAG = "MyTagViewModel" + Viewmodel_DeviceConsole::class.java.simpleName
     var textMessageList = MutableLiveData<MutableList<DataClass_MessageInfo>>()
 
     var isClient = MutableLiveData<Boolean>()
