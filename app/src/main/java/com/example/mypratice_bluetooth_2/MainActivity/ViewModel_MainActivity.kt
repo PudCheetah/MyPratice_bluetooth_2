@@ -27,5 +27,7 @@ class ViewModel_MainActivity: ViewModel(), BroadcastManager_interface {
         return scannedDevices.value
     }
 
+    override fun clearConnectSocket() {}
+
 
 }

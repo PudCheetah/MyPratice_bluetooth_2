@@ -107,7 +107,7 @@ class DeviceConsoleActivity_setupUI(
     }
     private fun btnAction_sendMessage(){
         if(bluetoothAdapter.isEnabled){
-            if(viewModel.connectSocket.value != null){
+            if(viewModel.connectSocket.value?.isConnected ?: false){
                 if(binding.etMessageInput.text?.isEmpty() == true){
                     Toast.makeText(activity, "不可傳送空白訊息", Toast.LENGTH_SHORT).show()
                 }else{

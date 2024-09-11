@@ -69,7 +69,10 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
         val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
         when(state){
             BluetoothAdapter.STATE_ON -> { viewModel.updateSwitchStatus(true)}
-            BluetoothAdapter.STATE_OFF -> { viewModel.updateSwitchStatus(false)}
+            BluetoothAdapter.STATE_OFF -> {
+                viewModel.updateSwitchStatus(false)
+                viewModel.clearConnectSocket()
+            }
         }
     }
 }

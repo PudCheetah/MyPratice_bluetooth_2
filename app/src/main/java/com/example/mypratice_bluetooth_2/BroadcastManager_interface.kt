@@ -6,4 +6,5 @@ interface BroadcastManager_interface {
     fun addDevice(device: DataClass_BluetoothDeviceInfo)
     fun updateSwitchStatus(isOn: Boolean)
     fun getScannedDevice(): MutableSet<DataClass_BluetoothDeviceInfo>?
+    fun clearConnectSocket()
 }

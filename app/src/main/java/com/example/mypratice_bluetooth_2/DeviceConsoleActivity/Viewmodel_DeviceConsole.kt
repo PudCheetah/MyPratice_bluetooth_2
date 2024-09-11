@@ -24,7 +24,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     var switchStatus = MutableLiveData<Boolean>()
     var connectSocket = MutableLiveData<BluetoothSocket>()
     private var myDao: MessageDao? = null
-    private lateinit var viewModelInitJob: Job
+    private var viewModelInitJob: Job
 
     init {
         textMessageList.value = mutableListOf()
@@ -67,7 +67,13 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         switchStatus.value = isOn
     }
     override fun addDevice(device: DataClass_BluetoothDeviceInfo) {}
-    override fun getScannedDevice(): MutableSet<DataClass_BluetoothDeviceInfo>? { return null }
+    override fun getScannedDevice(): MutableSet<DataClass_BluetoothDeviceInfo>? {
+        return null
+    }
+
+    override fun clearConnectSocket() {
+        connectSocket.value = null
+    }
 
 
 }
