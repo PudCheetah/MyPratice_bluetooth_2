@@ -1,4 +1,4 @@
-package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
+package com.example.mypratice_bluetooth_2
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -10,14 +10,13 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
 
-class DeviceConsoleSocketManager(val context: Context, val viewModel: Viewmodel_DeviceConsole, val MY_UUID: UUID) {
-    private val TAG = "MyTag" + DeviceConsoleSocketManager::class.java.simpleName
+class SocketManager(val context: Context, val viewModel: SocketManager_Interface, val MY_UUID: UUID) {
+    private val TAG = "MyTag" + SocketManager::class.java.simpleName
     //建立伺服器端(優畫板)
     suspend fun createBluetoothServerSocket_2(bluetoothAdapter: BluetoothAdapter){
         withContext(Dispatchers.IO){
@@ -37,7 +36,7 @@ class DeviceConsoleSocketManager(val context: Context, val viewModel: Viewmodel_
                     }
                 }
                 clientSocket = serverSocket.accept()
-                viewModel.connectSocket.postValue(clientSocket)
+                viewModel.updateConnectSocket(clientSocket)
                 Log.d(TAG, "createBluetoothServerSocket: Connection accepted")
                 clientSocket?.also {
                     withContext(Dispatchers.Main) {
@@ -73,7 +72,7 @@ class DeviceConsoleSocketManager(val context: Context, val viewModel: Viewmodel_
             try {
                 val socket: BluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID)
                 socket.connect()
-                viewModel.connectSocket.postValue(socket)
+                viewModel.updateConnectSocket(socket)
                 Log.d(TAG, "createBluetoothClientSocket: Connection successful")
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "連接成功", Toast.LENGTH_SHORT).show()

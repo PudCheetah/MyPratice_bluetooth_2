@@ -21,7 +21,7 @@
         android:theme="@style/Theme.MyPratice_bluetooth_2"
         tools:targetApi="31">
         <activity
-            android:name=".DeviceConsoleActivity.DeviceConsole"
+            android:name=".DeviceConsoleActivity.DeviceConsoleActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity.MainActivity"

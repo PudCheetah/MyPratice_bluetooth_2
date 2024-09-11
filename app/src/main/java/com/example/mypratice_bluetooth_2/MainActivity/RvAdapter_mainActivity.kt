@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mypratice_bluetooth_2.Database.DataClass_BluetoothDeviceInfo
-import com.example.mypratice_bluetooth_2.DeviceConsoleActivity.DeviceConsole
+import com.example.mypratice_bluetooth_2.DeviceConsoleActivity.DeviceConsoleActivity
 import com.example.mypratice_bluetooth_2.IntentLauncher
 import com.example.mypratice_bluetooth_2.databinding.RvItemMainActivityBinding
 
@@ -42,7 +42,7 @@ class RvAdapter_mainActivity(val context: Context, val viewModel: ViewModel_Main
                     deviceList?.get(position)?.deviceType ?: 0,
                     deviceList?.get(position)?.deviceUUID ?: "unknow deviceUUID"
                 )
-                val intent = Intent(context, DeviceConsole::class.java)
+                val intent = Intent(context, DeviceConsoleActivity::class.java)
                 intent.putExtra("DeviceInfo", deviceInfo)
                 intentLauncher.activityIntent(intent)
             }

@@ -1,4 +1,4 @@
-package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
+package com.example.mypratice_bluetooth_2
 
 import android.Manifest
 import android.bluetooth.BluetoothSocket
@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -15,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class MessageManager(val context: Context, val viewModel: Viewmodel_DeviceConsole) {
+class MessageManager(val context: Context, val viewModel: MessageManager_interface) {
     private val TAG = "MyTag" + MessageManager::class.java.simpleName
 
     //傳送訊息
@@ -59,7 +58,7 @@ class MessageManager(val context: Context, val viewModel: Viewmodel_DeviceConsol
                     message?.also {
                         withContext(Dispatchers.Main){
                             viewModel.addToMessageList(deviceAddress, deviceName, null, message)
-                            Log.d(TAG, "receiveMessages: ${viewModel.textMessageList.value}")
+                            Log.d(TAG, "receiveMessages: ${viewModel.gettextMessageList()}")
                         }
                     }
                 }

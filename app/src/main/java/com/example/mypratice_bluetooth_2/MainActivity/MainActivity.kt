@@ -13,6 +13,7 @@ import com.example.mypratice_bluetooth_2.BluetoothAction
 import com.example.mypratice_bluetooth_2.BroadcastManager
 import com.example.mypratice_bluetooth_2.IntentLauncher
 import com.example.mypratice_bluetooth_2.MyBluetoothManager
+import com.example.mypratice_bluetooth_2.PermissionManager
 import com.example.mypratice_bluetooth_2.databinding.ActivityMainBinding
 
 
@@ -25,39 +26,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var myBluetoothManager: MyBluetoothManager
     private lateinit var broadcastManager: BroadcastManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
+    private lateinit var listenerandobserve: MainActivity_setupUI
+    private lateinit var permissionManager: PermissionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this).get(ViewModel_MainActivity::class.java)
-        requestPermissions(permissionArray())
+        permissionManager = PermissionManager(this)
+        permissionManager.requestPermissions(permissionArray())
 
         myBluetoothManager = MyBluetoothManager(this)
         bluetoothAdapter = myBluetoothManager.getBluetoothAdapter()
         intentLauncher = IntentLauncher(this)
         broadcastManager = BroadcastManager(this, this, viewModel)
         bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
+        listenerandobserve = MainActivity_setupUI(this, viewModel, binding, bluetoothAction, intentLauncher)
 
-        rvSet()
-        switchInitSet()
 
+        listenerandobserve.setupListenersAndObservers()
+        checkSwitchStatus()
         setContentView(binding.root)
-        viewModel.scannedDevices.observe(this){
-            binding.rvMainActivity.adapter?.notifyDataSetChanged()
-            binding.root.invalidate()
-        }
-
-        binding.switch1.setOnCheckedChangeListener { buttonView, isCheck ->
-            if(isCheck){
-                bluetoothAction.enableBluetooth()
-            }else{
-                bluetoothAction.disableBluetooth()
-            }
-        }
-        binding.floatingActionButton3.setOnClickListener {
-            btnAction_activityScanning()
-            btnAction_changeBluetoothMode_discoverable()
-        }
     }
 
     fun permissionArray(): Array<String>{
@@ -78,30 +67,7 @@ class MainActivity : AppCompatActivity() {
         return permissions
     }
 
-    fun requestPermissions(permissionArray: Array<String>){
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ permissions ->
-            permissionArray.forEach { permission ->
-                val statu = when(permissions[permission]){
-                    true -> {"success"}
-                    false -> {"fail"}
-                    else -> {"unknow"}
-                }
-                Log.d(TAG, "requestPermissions: ${permission}: ${statu}")
-            }
-        }.launch(permissionArray)
-    }
-
-    fun rvSet(){
-        binding.rvMainActivity.layoutManager = LinearLayoutManager(this)
-        binding.rvMainActivity.adapter = RvAdapter_mainActivity(this, viewModel, intentLauncher)
-    }
-    fun switchInitSet(){
+    fun checkSwitchStatus(){
         binding.switch1.isChecked = bluetoothAdapter.isEnabled
-    }
-    fun btnAction_activityScanning(){
-        bluetoothAction.activityScanning()
-    }
-    fun btnAction_changeBluetoothMode_discoverable(){
-        bluetoothAction.changeBluetoothMode_discoverable()
     }
 }

@@ -13,9 +13,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.mypratice_bluetooth_2.Database.DataClass_BluetoothDeviceInfo
-import com.example.mypratice_bluetooth_2.MainActivity.ViewModel_MainActivity
 
-class BroadcastManager(val context: Context, val activity: AppCompatActivity, val viewModel: ViewModel_MainActivity) {
+class BroadcastManager(val context: Context, val activity: AppCompatActivity, val viewModel: BroadcastManager_interface) {
     private val TAG = "MyTag" + BroadcastManager::class.java.simpleName
 
     init {
@@ -26,6 +25,7 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND).apply {
             addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
             addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+            addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         }
         return filter
     }
@@ -37,6 +37,7 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
                     BluetoothDevice.ACTION_FOUND -> { broadcastAction_ACTION_FOUND(intent)}
                     BluetoothAdapter.ACTION_DISCOVERY_STARTED -> { broadcastAction_ACTION_DISCOVERY_STARTED()}
                     BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> { broadcastAction_ACTION_DISCOVERY_FINISHED()}
+                    BluetoothAdapter.ACTION_STATE_CHANGED -> { broadcastAction_ACTION_STATE_CHANGED(intent) }
                 }
             }
         }
@@ -54,7 +55,7 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
         val deviceInfo = DataClass_BluetoothDeviceInfo(deviceName, deviceAddress, deviceType, deviceUUID)
         viewModel.addDevice(deviceInfo)
         Log.d(TAG, "ACTION_FOUND: ${deviceName}: ${deviceAddress}")
-        Log.d(TAG, "broadcastAction_ACTION_FOUND(ViewModel): ${viewModel.scannedDevices.value}")
+        Log.d(TAG, "broadcastAction_ACTION_FOUND(ViewModel): ${viewModel.getScannedDevice()}")
     }
     fun broadcastAction_ACTION_DISCOVERY_STARTED(){
         Toast.makeText(context, "Discovery started", Toast.LENGTH_LONG).show()
@@ -63,5 +64,12 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
     fun broadcastAction_ACTION_DISCOVERY_FINISHED(){
         Toast.makeText(context, "Discovery finished", Toast.LENGTH_LONG).show()
         Log.d(TAG, "Discovery finished")
+    }
+    fun broadcastAction_ACTION_STATE_CHANGED(intent: Intent){
+        val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+        when(state){
+            BluetoothAdapter.STATE_ON -> { viewModel.updateSwitchStatus(true)}
+            BluetoothAdapter.STATE_OFF -> { viewModel.updateSwitchStatus(false)}
+        }
     }
 }
