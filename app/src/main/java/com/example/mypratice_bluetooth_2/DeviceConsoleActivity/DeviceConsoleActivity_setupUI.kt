@@ -73,16 +73,16 @@ class DeviceConsoleActivity_setupUI(
         }
     }
     private fun setupObserve(){
-        viewModel.textMessageList.observe(activity){
-            if(viewModel.textMessageList.value?.size != 0){
-                Toast.makeText(activity, "${viewModel.textMessageList.value?.last()}", Toast.LENGTH_SHORT).show()
-            }
-            binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
-            CoroutineScope(Dispatchers.Main).launch{
-                binding.rvDeviceConsole.scrollToPosition((viewModel.textMessageList.value!!.size - 1))
-            }
-            binding.root.invalidate()
-        }
+//        viewModel.textMessageList.observe(activity){
+//            if(viewModel.textMessageList.value?.size != 0){
+//                Toast.makeText(activity, "${viewModel.textMessageList.value?.last()}", Toast.LENGTH_SHORT).show()
+//            }
+//            binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
+//            CoroutineScope(Dispatchers.Main).launch{
+//                binding.rvDeviceConsole.scrollToPosition((viewModel.textMessageList.value!!.size - 1))
+//            }
+//            binding.root.invalidate()
+//        }
         viewModel.switchStatus.observe(activity){
             activity.checkSwitchStatus()
         }

@@ -13,5 +13,5 @@ data class DataClass_MessageInfo(
     val time: String?,
     val message: String,
     val reciveStatus: Boolean?,
-    val randomID: UUID?
+    val randomID: String?
 )

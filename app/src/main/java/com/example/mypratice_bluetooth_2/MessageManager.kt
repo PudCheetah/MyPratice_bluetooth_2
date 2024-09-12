@@ -24,14 +24,18 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
             try {
                 val outputStream = socket?.outputStream
                 var newMessage = ""
+                val randomMessageID = UUID.randomUUID().toString()
+                val sourceAddress = viewModel.getLocalAddress()
                 if(needPacking == true){
                     newMessage = packingMessage(message) ?: "unknow"
+                    Log.d(TAG, "sendMessage: needPacking == true")
                 }else{
                     newMessage = message ?: "unknow"
+                    Log.d(TAG, "sendMessage: needPacking == false")
                 }
                 outputStream?.write(newMessage?.toByteArray())
                 outputStream?.flush()
-                Log.d(TAG, "Message sent: $message")
+                Log.d(TAG, "Message sent: $newMessage")
             } catch (e: IOException) {
                 Log.e(TAG, "Error sending message", e)
             }
@@ -53,13 +57,20 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
                     // 從輸入流中讀取數據
                     val bytes = inputStream?.read(buffer)
                     val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
-                    val unpackingMessage = unpackingMessage(message)
-                    if (unpackingMessage != null){
-                        if(isReply(unpackingMessage) == true){
-                            viewModel.findAndUpdate_textMessageList(unpackingMessage.get(1))
+                    val newMessage = unpackingMessage(message)
+                    if (newMessage != null){
+                        if(isReply(newMessage) == false){
+                            Log.d(TAG, "isReply(unpackingMessage) == false -> ${newMessage}")
+                            sendReply(socket, newMessage?.get(0))
+                            withContext(Dispatchers.Main){
+                                viewModel.updateVM_textMessageList(newMessage.get(0), newMessage.get(1),newMessage.get(2))
+                            }
                         }else{
-                            sendReply(socket, unpackingMessage?.get(1))
-                            viewModel.updateVM_textMessageList(unpackingMessage.get(0), unpackingMessage.get(1), unpackingMessage.get(2))
+                            Log.d(TAG, "isReply(unpackingMessage) == true -> ${newMessage}")
+                            withContext(Dispatchers.Main){
+                                Log.d(TAG, "isReply(newMessage) == true -> unpackingMessage: ${newMessage.get(0)}")
+                                viewModel.findAndUpdate_textMessageList(newMessage.get(0))
+                            }
                         }
                     }
                     Log.d(TAG, "Message received: $message")
@@ -70,12 +81,15 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
         }
     }
     //加工訊息
-    fun packingMessage(message: String?): String?{
+    suspend fun packingMessage(message: String?): String?{
         var processedMessage: String? = null
         val randomMessageID = UUID.randomUUID().toString()
         val splitSymbo = "|!@#|"
         val sourceAddress = viewModel.getLocalAddress()
-        processedMessage = "${sourceAddress}" + "${splitSymbo}" + "${randomMessageID}" + "${splitSymbo}" + "${message}"
+        withContext(Dispatchers.Main){
+            viewModel.updateVM_textMessageList(randomMessageID, sourceAddress, message?: "unknow")
+        }
+        processedMessage = "${randomMessageID}" + "${splitSymbo}" + "${sourceAddress}" + "${splitSymbo}" + "${message}"
 
         return processedMessage
     }
@@ -85,6 +99,7 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
         return messageList
     }
 
+    //判斷訊息是否為已讀確認
     fun isReply(list: List<String>?): Boolean {
         return list?.size == 1
     }

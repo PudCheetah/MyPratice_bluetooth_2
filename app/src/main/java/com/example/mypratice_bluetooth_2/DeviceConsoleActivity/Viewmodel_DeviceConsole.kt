@@ -2,6 +2,7 @@ package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
 import android.app.Application
 import android.bluetooth.BluetoothSocket
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.mypratice_bluetooth_2.BroadcastManager_interface
@@ -16,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(application), MessageManager_interface, SocketManager_Interface, BroadcastManager_interface {
     private val TAG = "MyTagViewModel" + Viewmodel_DeviceConsole::class.java.simpleName
@@ -28,6 +28,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     private var viewModelInitJob: Job
     var localAddress = MutableLiveData<String>()
     private var targetAddress = MutableLiveData<String>()
+
 
     init {
         textMessageList.value = mutableListOf()
@@ -70,20 +71,24 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     }
 
     //已讀功能，根據randomMessageID尋找textMessageList對應的資料並將他的reciveStatus改為true
-    override fun findAndUpdate_textMessageList(randomMessageID: String) {
+    override fun findAndUpdate_textMessageList(randomMessageID: String?) {
         val filterString = randomMessageID
-        textMessageList.value?.replaceAll { if (it.randomID.toString() == filterString) it.copy(reciveStatus = true)else it }
+        textMessageList.value?.replaceAll { if (it.randomID == filterString) it.copy(reciveStatus = true)else it }
+        textMessageList.value = textMessageList.value
+        Log.d(TAG, "findAndUpdate_textMessageList: ${textMessageList.value}")
     }
     //將訊息根據Address是否和本機相等來加上local，並將其放入textMessageList
-    override fun updateVM_textMessageList(sourceAddress: String?,randomMessageID: String,message: String) {
+    override fun updateVM_textMessageList(randomMessageID: String,sourceAddress: String?,message: String) {
+        Log.d(TAG, "updateVM_textMessageList: ${localAddress.value}")
         var sourceType = ""
         if(sourceAddress == localAddress.value){
             sourceType = "local"
         }else{
             sourceType = "other"
         }
-        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAddress, sourceType, null, message, null, randomMessageID as UUID))
+        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAddress, sourceType, null, message, false, randomMessageID))
         textMessageList.value = textMessageList.value
+        Log.d(TAG, "updateVM_textMessageList: ${textMessageList.value}")
     }
 
 

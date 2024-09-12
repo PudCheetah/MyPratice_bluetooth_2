@@ -8,6 +8,6 @@ interface MessageManager_interface {
 
     fun getLocalAddress(): String?
     fun getTargetAddress(): String?
-    fun findAndUpdate_textMessageList(randomMessageID: String)
-    fun updateVM_textMessageList(sourceAddress: String?, randomMessageID: String, message: String)
+    fun findAndUpdate_textMessageList(randomMessageID: String?)
+    fun updateVM_textMessageList(randomMessageID: String, sourceAddress: String?, message: String)
 }

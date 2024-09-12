@@ -59,7 +59,11 @@ class Messagemanager_2(val context: Context, val viewModel: MessageManager_inter
                             viewModel.findAndUpdate_textMessageList(unpackingMessage.get(1))
                         }else{
                             sendReply(socket, unpackingMessage?.get(1))
-                            viewModel.updateVM_textMessageList(unpackingMessage.get(0), unpackingMessage.get(1), unpackingMessage.get(2))
+                            viewModel.updateVM_textMessageList(
+                                unpackingMessage.get(1),
+                                unpackingMessage.get(0),
+                                unpackingMessage.get(2)
+                            )
                         }
                     }
                     Log.d(TAG, "Message received: $message")
