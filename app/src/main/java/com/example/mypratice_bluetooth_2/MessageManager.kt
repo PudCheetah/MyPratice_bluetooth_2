@@ -13,18 +13,19 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.util.UUID
 
 class MessageManager(val context: Context, val viewModel: MessageManager_interface) {
     private val TAG = "MyTag" + MessageManager::class.java.simpleName
 
     //傳送訊息
-    fun sendMessage(socket: BluetoothSocket?, message: String) {
+    fun sendMessage(socket: BluetoothSocket?, message: String, sourceType: String?) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val outputStream = socket?.outputStream
                 withContext(Dispatchers.Main){
                     val address = socket?.remoteDevice?.address
-                    viewModel.addToMessageList(address, null, null, message)
+                    viewModel.addToMessageList(address, sourceType, null, message)
                 }
                 outputStream?.write(message.toByteArray())
                 outputStream?.flush()
@@ -64,6 +65,34 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
                 }
             } catch (e: IOException) {
                 Log.e(TAG, "Error receiving message", e)
+            }
+        }
+    }
+    fun outputMessageFactory(message: String, sourceType: String?): String?{
+        var processedMessage: String? = null
+        val randomMessageID = UUID.randomUUID().toString()
+        val splitSymbo = "|!@#|"
+        val sourceAddress = viewModel.getLocalAddress()
+        processedMessage = "${sourceAddress}" + "${splitSymbo}" + "${randomMessageID}" + "${splitSymbo}" + "${message}"
+
+        return processedMessage
+    }
+    fun restortedMessageToVM(message: String){
+        var messageList = message.split("|!@#|")
+        var sourceAddress = ""
+        var randomMessageID = ""
+        var message = ""
+        when(messageList.size){
+            2 -> {
+                sourceAddress = messageList[0]
+                randomMessageID = messageList[1]
+                viewModel.updateVM_textMessageList(sourceAddress, randomMessageID)
+            }
+            else -> {
+                sourceAddress = messageList[0]
+                randomMessageID = messageList[1]
+                message = messageList[2]
+                viewModel.updateVM_textMessageList(sourceAddress, randomMessageID, message)
             }
         }
     }

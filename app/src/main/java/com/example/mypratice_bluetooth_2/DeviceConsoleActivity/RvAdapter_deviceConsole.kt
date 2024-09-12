@@ -27,7 +27,7 @@ class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerV
         holder.itemView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         with(holder){
             val messageInfo = viewModel.textMessageList.value?.get(position)
-            if(messageInfo?.sourceName == "local"){
+            if(messageInfo?.sourceType == "local"){
                 //變更顏色
                 tv_1_rvItem.setBackgroundColor(Color.GREEN)
                 // 置右
@@ -41,7 +41,7 @@ class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerV
                 CL_set_2(tv_source, (0).toFloat())
             }
             tv_1_rvItem.text = messageInfo?.message
-            tv_source.text = messageInfo?.sourceName
+            tv_source.text = messageInfo?.sourceType
         }
     }
     //按照percent(0-1)的比例來變更view的水平位置

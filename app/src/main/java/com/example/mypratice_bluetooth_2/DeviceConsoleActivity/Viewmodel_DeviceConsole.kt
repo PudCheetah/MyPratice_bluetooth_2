@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(application), MessageManager_interface, SocketManager_Interface, BroadcastManager_interface {
     private val TAG = "MyTagViewModel" + Viewmodel_DeviceConsole::class.java.simpleName
@@ -25,6 +26,8 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     var connectSocket = MutableLiveData<BluetoothSocket>()
     private var myDao: MessageDao? = null
     private var viewModelInitJob: Job
+    private var localAddress = MutableLiveData<String>()
+    private var targetAddress = MutableLiveData<String>()
 
     init {
         textMessageList.value = mutableListOf()
@@ -48,15 +51,39 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         return viewModelInitJob
     }
 
-    override fun addToMessageList(address: String?,source: String?,time: String?,string: String
-    ) {
-        textMessageList.value?.add(DataClass_MessageInfo(null, address, source ?: "local", time ?: null,string))
+    override fun addToMessageList(address: String?, sourceType: String?, time: String?, string: String) {
+        textMessageList.value?.add(DataClass_MessageInfo(null, address, sourceType ?: "local", time ?: null,string, null, null))
         textMessageList.value = textMessageList.value
     }
 
     override fun gettextMessageList(): MutableList<DataClass_MessageInfo>? {
         return textMessageList.value
     }
+
+    override fun getLocalAddress(): String? {
+        return localAddress.value
+    }
+
+    override fun getTargetAddress(): String? {
+        return connectSocket.value?.remoteDevice?.address
+    }
+
+    override fun updateVM_textMessageList(sourceAddress: String?, randomMessageID: String) {
+        val filterString = randomMessageID
+        textMessageList.value?.replaceAll { if (it.randomID.toString() == filterString) it.copy(reciveStatus = true)else it }
+    }
+
+    override fun updateVM_textMessageList(sourceAddress: String?,randomMessageID: String,message: String) {
+        var sourceType = ""
+        if(sourceAddress == localAddress.value){
+            sourceType = "local"
+        }else{
+            sourceType = "other"
+        }
+        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAddress, sourceType, null, message, null, randomMessageID as UUID))
+        textMessageList.value = textMessageList.value
+    }
+
 
     override suspend fun updateConnectSocket(socket: BluetoothSocket?) {
         withContext(Dispatchers.IO){
