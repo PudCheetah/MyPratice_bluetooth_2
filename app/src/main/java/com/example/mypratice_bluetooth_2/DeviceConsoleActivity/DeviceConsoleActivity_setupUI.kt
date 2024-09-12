@@ -112,7 +112,7 @@ class DeviceConsoleActivity_setupUI(
                     Toast.makeText(activity, "不可傳送空白訊息", Toast.LENGTH_SHORT).show()
                 }else{
                     val message = binding.etMessageInput.text.toString()
-                    messageManager.sendMessage(viewModel.connectSocket.value, message, null)
+                    messageManager.sendMessage(viewModel.connectSocket.value, message, true)
                     binding.etMessageInput.text?.clear()
                 }
             }else{

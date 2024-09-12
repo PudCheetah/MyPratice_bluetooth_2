@@ -26,13 +26,14 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     var connectSocket = MutableLiveData<BluetoothSocket>()
     private var myDao: MessageDao? = null
     private var viewModelInitJob: Job
-    private var localAddress = MutableLiveData<String>()
+    var localAddress = MutableLiveData<String>()
     private var targetAddress = MutableLiveData<String>()
 
     init {
         textMessageList.value = mutableListOf()
         connectSocket.value = null
         switchStatus.value = null
+        localAddress.value = ""
         viewModelInitJob = CoroutineScope(Dispatchers.IO).launch {
             myDao = MessageDatabase?.getInstance(application)?.messageDao()
             textMessageList.postValue(myDao?.getAllMessage())
@@ -68,11 +69,12 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         return connectSocket.value?.remoteDevice?.address
     }
 
-    override fun updateVM_textMessageList(sourceAddress: String?, randomMessageID: String) {
+    //已讀功能，根據randomMessageID尋找textMessageList對應的資料並將他的reciveStatus改為true
+    override fun findAndUpdate_textMessageList(randomMessageID: String) {
         val filterString = randomMessageID
         textMessageList.value?.replaceAll { if (it.randomID.toString() == filterString) it.copy(reciveStatus = true)else it }
     }
-
+    //將訊息根據Address是否和本機相等來加上local，並將其放入textMessageList
     override fun updateVM_textMessageList(sourceAddress: String?,randomMessageID: String,message: String) {
         var sourceType = ""
         if(sourceAddress == localAddress.value){

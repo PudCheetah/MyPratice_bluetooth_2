@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
 
-class MessageManager(val context: Context, val viewModel: MessageManager_interface) {
+class Messagemanager_2(val context: Context, val viewModel: MessageManager_interface) {
     private val TAG = "MyTag" + MessageManager::class.java.simpleName
 
     //傳送訊息
