@@ -46,7 +46,7 @@ class DeviceConsoleActivity : AppCompatActivity() {
         binding = ActivityDeviceConsoleBinding.inflate(layoutInflater)
         intentLauncher = IntentLauncher(this)
         viewModel = ViewModelProvider(this).get(Viewmodel_DeviceConsole::class.java)
-        viewModel.localAddress.value = bluetoothAdapter.address
+        viewModel.localAddress.value = deviceInfo?.deviceAddress
         socketManager = SocketManager(this, viewModel, MY_UUID)
         messageManager = MessageManager(this, viewModel)
         bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
