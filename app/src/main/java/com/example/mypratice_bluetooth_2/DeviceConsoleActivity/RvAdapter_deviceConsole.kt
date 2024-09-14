@@ -46,13 +46,25 @@ class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerV
             }
             tv_1_rvItem.text = messageInfo?.message
             tv_source.text = messageInfo?.sourceAddress
-            if (messageInfo?.sourceType != "local"){
-                tv_reply.isInvisible = true
-            }else{
-                tv_reply.text = messageInfo?.reciveStatus.toString()
-            }
 
+            //改進版: 如果sourceType不為local，就隱藏，不為local且reciveStatus為true則顯示成功，false顯示失敗
+            tv_reply.isInvisible = messageInfo?.sourceType != "local"
+            if (!tv_reply.isInvisible) {
+                tv_reply.text = if (messageInfo?.reciveStatus == true) "傳送成功" else "傳送失敗"
+            }
+            //原版: 如果sourceType不為local，就隱藏，不為local且reciveStatus為true則顯示成功，false顯示失敗
+//            if (messageInfo?.sourceType != "local"){
+//                tv_reply.isInvisible = true
+//            }else{
+//                tv_reply.isInvisible = false
+//                if(messageInfo?.reciveStatus.toString() == "true"){
+//                    tv_reply.text = "傳送成功"
+//                }else{
+//                    tv_reply.text = "傳送失敗"
+//                }
+//            }
         }
+
     }
     //按照percent(0-1)的比例來變更view的水平位置
     fun CL_set(view: View, percent: Float){

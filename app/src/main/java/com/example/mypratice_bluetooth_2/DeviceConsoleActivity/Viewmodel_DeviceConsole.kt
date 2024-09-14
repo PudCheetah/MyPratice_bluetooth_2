@@ -73,6 +73,8 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     //已讀功能，根據randomMessageID尋找textMessageList對應的資料並將他的reciveStatus改為true
     override fun findAndUpdate_textMessageList(randomMessageID: String?) {
         val filterString = randomMessageID
+        Log.d(TAG, "findAndUpdate_textMessageListA: ${randomMessageID}")
+        Log.d(TAG, "findAndUpdate_textMessageListB: ${textMessageList.value?.last()?.randomID}")
         textMessageList.value?.replaceAll { if (it.randomID == filterString) it.copy(reciveStatus = true)else it }
         textMessageList.value = textMessageList.value
         Log.d(TAG, "findAndUpdate_textMessageList: ${textMessageList.value}")
