@@ -8,7 +8,8 @@ import java.util.UUID
 data class DataClass_MessageInfo(
     @PrimaryKey(autoGenerate = true)
     val sourceID: Long? = 0,
-    val sourceAddress: String ?= "unknow Address",
+    val sourceAddress: String ?= "unknowSourceAddress",
+    val targetAddress: String ?= "unlnowTargetAddress",
     val sourceType: String,
     val time: String?,
     val message: String,

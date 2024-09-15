@@ -2,6 +2,7 @@ package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
 import android.app.Application
 import android.bluetooth.BluetoothSocket
+import android.location.Address
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -27,7 +28,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     private var myDao: MessageDao? = null
     private var viewModelInitJob: Job
     var localAddress = MutableLiveData<String>()
-    private var targetAddress = MutableLiveData<String>()
+    var targetAddress = MutableLiveData<String>()
 
 
     init {
@@ -53,10 +54,10 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         return viewModelInitJob
     }
 
-    override fun addToMessageList(address: String?, sourceType: String?, time: String?, string: String) {
-        textMessageList.value?.add(DataClass_MessageInfo(null, address, sourceType ?: "local", time ?: null,string, null, null))
-        textMessageList.value = textMessageList.value
-    }
+//    override fun addToMessageList(address: String?, sourceType: String?, time: String?, string: String) {
+//        textMessageList.value?.add(DataClass_MessageInfo(null, address,getTargetAddress(), sourceType ?: "local", time ?: null,string, null, null))
+//        textMessageList.value = textMessageList.value
+//    }
 
     override fun gettextMessageList(): MutableList<DataClass_MessageInfo>? {
         return textMessageList.value
@@ -66,7 +67,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         return localAddress.value
     }
 
-    override fun getTargetAddress(): String? {
+    override fun getTargetAddressFromConnectSocket(): String? {
         return connectSocket.value?.remoteDevice?.address
     }
 
@@ -80,7 +81,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         Log.d(TAG, "findAndUpdate_textMessageList: ${textMessageList.value}")
     }
     //將訊息根據Address是否和本機相等來加上local，並將其放入textMessageList
-    override fun updateVM_textMessageList(randomMessageID: String,sourceAddress: String?,message: String) {
+    override fun updateVM_textMessageList(randomMessageID: String,sourceAddress: String?, targetAddress: String?,message: String) {
         Log.d(TAG, "updateVM_textMessageList: ${localAddress.value}")
         var sourceType = ""
         if(sourceAddress == localAddress.value){
@@ -88,7 +89,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         }else{
             sourceType = "other"
         }
-        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAddress, sourceType, null, message, false, randomMessageID))
+        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAddress, targetAddress, sourceType,null, message, false, randomMessageID))
         textMessageList.value = textMessageList.value
         Log.d(TAG, "updateVM_textMessageList: ${textMessageList.value}")
     }

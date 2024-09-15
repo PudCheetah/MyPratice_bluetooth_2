@@ -62,7 +62,8 @@ class Messagemanager_2(val context: Context, val viewModel: MessageManager_inter
                             viewModel.updateVM_textMessageList(
                                 unpackingMessage.get(1),
                                 unpackingMessage.get(0),
-                                unpackingMessage.get(2)
+                                unpackingMessage.get(2),
+                                unpackingMessage.get(3)
                             )
                         }
                     }

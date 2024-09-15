@@ -26,6 +26,7 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
                 var newMessage = ""
                 val randomMessageID = UUID.randomUUID().toString()
                 val sourceAddress = viewModel.getLocalAddress()
+                val targetAddress = viewModel.getTargetAddressFromConnectSocket()
                 if(needPacking == true){
                     newMessage = packingMessage(message) ?: "unknow"
                     Log.d(TAG, "sendMessage: needPacking == true")
@@ -63,7 +64,7 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
                             Log.d(TAG, "isReply(unpackingMessage) == false -> ${newMessage}")
                             sendReply(socket, newMessage?.get(0))
                             withContext(Dispatchers.Main){
-                                viewModel.updateVM_textMessageList(newMessage.get(0), newMessage.get(1),newMessage.get(2))
+                                viewModel.updateVM_textMessageList(newMessage.get(0), newMessage.get(1),newMessage.get(2), newMessage.get(3))
                             }
                         }else{
                             Log.d(TAG, "isReply(unpackingMessage) == true -> ${newMessage}")
@@ -86,10 +87,11 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
         val randomMessageID = UUID.randomUUID().toString()
         val splitSymbo = "|!@#|"
         val sourceAddress = viewModel.getLocalAddress()
+        val targetAddress = viewModel.getTargetAddressFromConnectSocket()
         withContext(Dispatchers.Main){
-            viewModel.updateVM_textMessageList(randomMessageID, sourceAddress, message?: "unknow")
+            viewModel.updateVM_textMessageList(randomMessageID, sourceAddress, targetAddress, message?: "unknow")
         }
-        processedMessage = "${randomMessageID}" + "${splitSymbo}" + "${sourceAddress}" + "${splitSymbo}" + "${message}"
+        processedMessage = "${randomMessageID}" + "${splitSymbo}" + "${sourceAddress}" + "${splitSymbo}" + "${targetAddress}" + "${splitSymbo}" + "${message}"
 
         return processedMessage
     }
