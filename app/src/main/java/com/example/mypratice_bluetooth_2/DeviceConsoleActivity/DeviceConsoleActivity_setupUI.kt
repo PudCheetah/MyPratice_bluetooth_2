@@ -95,13 +95,17 @@ class DeviceConsoleActivity_setupUI(
     private fun btnAction_connect(){
         CoroutineScope(Dispatchers.IO).launch {
             if(socketManager.createBluetoothClientSocket_2(bluetoothDevice) == true){
-
+                socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+                socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
             }else{
                 withContext(Dispatchers.Main){
                     Toast.makeText(activity, "嘗試建立伺服器", Toast.LENGTH_SHORT).show()
                 }
                 socketManager.createBluetoothServerSocket_2(bluetoothAdapter)
+                socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
             }
+            Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
             messageManager.receiveMessages(viewModel.connectSocket.value)
         }
     }

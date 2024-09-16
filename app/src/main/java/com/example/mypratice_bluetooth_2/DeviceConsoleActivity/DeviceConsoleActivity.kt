@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -47,12 +48,16 @@ class DeviceConsoleActivity : AppCompatActivity() {
         intentLauncher = IntentLauncher(this)
         viewModel = ViewModelProvider(this).get(Viewmodel_DeviceConsole::class.java)
         viewModel.localAddress.value = bluetoothAdapter.address
+        viewModel.localAndrdoiID_VM.value = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
         socketManager = SocketManager(this, viewModel, MY_UUID)
         messageManager = MessageManager(this, viewModel)
         bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
         setupUI = DeviceConsoleActivity_setupUI(this, binding, bluetoothAction, socketManager, bluetoothDevice, viewModel, messageManager, bluetoothAdapter)
         broadcastManager = BroadcastManager(this, this, viewModel)
         setupUI.initializeUI()
+        binding.fab2.setOnClickListener {
+            Log.d(TAG, "testFAB: ${viewModel.localAndrdoiID_VM.value} , ${viewModel.targetAndroidID_VM.value}")
+        }
         setContentView(binding.root)
     }
 

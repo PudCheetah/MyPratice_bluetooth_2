@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = arrayOf(DataClass_MessageInfo::class), version = 1)
+@Database(entities = arrayOf(DataClass_AddressAndAndroidID::class, DataClass_MessageInfo::class), version = 1)
 abstract class MessageDatabase: RoomDatabase() {
 
     abstract fun messageDao(): MessageDao

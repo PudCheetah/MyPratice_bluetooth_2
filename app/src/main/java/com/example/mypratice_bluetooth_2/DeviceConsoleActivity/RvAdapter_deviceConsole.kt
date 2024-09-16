@@ -45,7 +45,7 @@ class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerV
                 CL_set(tv_reply, (0).toFloat())
             }
             tv_1_rvItem.text = messageInfo?.message
-            tv_source.text = messageInfo?.sourceAddress
+            tv_source.text = messageInfo?.sourceAndroidID
 
             //改進版: 如果sourceType不為local，就隱藏，不為local且reciveStatus為true則顯示成功，false顯示失敗
             tv_reply.isInvisible = messageInfo?.sourceType != "local"

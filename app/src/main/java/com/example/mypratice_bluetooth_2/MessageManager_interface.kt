@@ -10,4 +10,6 @@ interface MessageManager_interface {
     fun getTargetAddressFromConnectSocket(): String?
     fun findAndUpdate_textMessageList(randomMessageID: String?)
     fun updateVM_textMessageList(randomMessageID: String,sourceAddress: String?, targetAddress: String?,message: String)
+    suspend fun getLocalAndrdoiID(): String?
+    suspend fun getTargetAndroidID(): String?
 }

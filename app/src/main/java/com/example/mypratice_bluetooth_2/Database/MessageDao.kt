@@ -10,7 +10,6 @@ interface MessageDao {
     @Upsert
     fun UpsertMessage(messageInfo: DataClass_MessageInfo)
 
-
     @Query("select * FROM DataClass_MessageInfo")
     fun getAllMessage(): MutableList<DataClass_MessageInfo>
 

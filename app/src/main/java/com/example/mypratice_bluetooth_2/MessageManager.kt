@@ -13,6 +13,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.io.InputStream
 import java.util.UUID
 
 class MessageManager(val context: Context, val viewModel: MessageManager_interface) {
@@ -24,9 +25,6 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
             try {
                 val outputStream = socket?.outputStream
                 var newMessage = ""
-                val randomMessageID = UUID.randomUUID().toString()
-                val sourceAddress = viewModel.getLocalAddress()
-                val targetAddress = viewModel.getTargetAddressFromConnectSocket()
                 if(needPacking == true){
                     newMessage = packingMessage(message) ?: "unknow"
                     Log.d(TAG, "sendMessage: needPacking == true")
@@ -56,42 +54,47 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
                 val buffer = ByteArray(1024) // 用來存儲接收的數據
                 while (isActive) {
                     // 從輸入流中讀取數據
-                    val bytes = inputStream?.read(buffer)
-                    val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
-                    val newMessage = unpackingMessage(message)
-                    if (newMessage != null){
-                        if(isReply(newMessage) == false){
-                            Log.d(TAG, "isReply(unpackingMessage) == false -> ${newMessage}")
-                            sendReply(socket, newMessage?.get(0))
-                            withContext(Dispatchers.Main){
-                                viewModel.updateVM_textMessageList(newMessage.get(0), newMessage.get(1),newMessage.get(2), newMessage.get(3))
-                            }
-                        }else{
-                            Log.d(TAG, "isReply(unpackingMessage) == true -> ${newMessage}")
-                            withContext(Dispatchers.Main){
-                                Log.d(TAG, "isReply(newMessage) == true -> unpackingMessage: ${newMessage.get(0)}")
-                                viewModel.findAndUpdate_textMessageList(newMessage.get(0))
-                            }
-                        }
-                    }
-                    Log.d(TAG, "Message received: $message")
+                    messageListener(inputStream, buffer, socket)
                 }
             } catch (e: IOException) {
                 Log.e(TAG, "Error receiving message", e)
             }
         }
     }
+
+    //監聽程序
+    suspend fun messageListener(inputStream: InputStream?, buffer:  ByteArray, socket: BluetoothSocket?){
+        val bytes = inputStream?.read(buffer)
+        val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
+        val newMessage = unpackingMessage(message)
+        if (newMessage != null){
+            if(isReply(newMessage) == false){
+                Log.d(TAG, "isReply(unpackingMessage) == false -> ${newMessage}")
+                sendReply(socket, newMessage?.get(0))
+                withContext(Dispatchers.Main){
+                    viewModel.updateVM_textMessageList(newMessage.get(0), newMessage.get(1),newMessage.get(2), newMessage.get(3))
+                }
+            }else{
+                Log.d(TAG, "isReply(unpackingMessage) == true -> ${newMessage}")
+                withContext(Dispatchers.Main){
+                    Log.d(TAG, "isReply(newMessage) == true -> unpackingMessage: ${newMessage.get(0)}")
+                    viewModel.findAndUpdate_textMessageList(newMessage.get(0))
+                }
+            }
+        }
+        Log.d(TAG, "Message received: $message")
+    }
     //加工訊息
     suspend fun packingMessage(message: String?): String?{
         var processedMessage: String? = null
         val randomMessageID = UUID.randomUUID().toString()
         val splitSymbo = "|!@#|"
-        val sourceAddress = viewModel.getLocalAddress()
-        val targetAddress = viewModel.getTargetAddressFromConnectSocket()
+        val sourceAndroidID = viewModel.getLocalAndrdoiID()
+        val targetAndroidID = viewModel.getTargetAndroidID()
         withContext(Dispatchers.Main){
-            viewModel.updateVM_textMessageList(randomMessageID, sourceAddress, targetAddress, message?: "unknow")
+            viewModel.updateVM_textMessageList(randomMessageID, sourceAndroidID, targetAndroidID, message?: "unknow")
         }
-        processedMessage = "${randomMessageID}" + "${splitSymbo}" + "${sourceAddress}" + "${splitSymbo}" + "${targetAddress}" + "${splitSymbo}" + "${message}"
+        processedMessage = "${randomMessageID}" + "${splitSymbo}" + "${sourceAndroidID}" + "${splitSymbo}" + "${targetAndroidID}" + "${splitSymbo}" + "${message}"
 
         return processedMessage
     }
@@ -107,6 +110,41 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
     }
     fun sendReply(socket: BluetoothSocket?, randomMessageID: String?){
         sendMessage(socket, randomMessageID, false)
+    }
+
+    fun sendAuthenticationMessage(socket: BluetoothSocket?, message: String?){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val outputStream = socket?.outputStream
+                outputStream?.write(message?.toByteArray())
+                outputStream?.flush()
+            }catch (e: IOException){
+                Log.e(TAG, "Error sending message", e)
+            }
+        }
+    }
+    fun receiveAuthenticationMessage(socket: BluetoothSocket?){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                if (ActivityCompat.checkSelfPermission(context,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "receiveMessages: Permission Problem")
+                }
+                withContext(Dispatchers.Main){
+                    Toast.makeText(context, "開始監聽", Toast.LENGTH_SHORT).show()
+                }
+                val inputStream = socket?.inputStream
+                val buffer = ByteArray(1024) // 用來存儲接收的數據
+                // 從輸入流中讀取數據
+                val bytes = inputStream?.read(buffer)
+                val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
+                if (message != null){
+
+                }
+                Log.d(TAG, "Message received: $message")
+            } catch (e: IOException) {
+                Log.e(TAG, "Error receiving message", e)
+            }
+        }
     }
 
 }

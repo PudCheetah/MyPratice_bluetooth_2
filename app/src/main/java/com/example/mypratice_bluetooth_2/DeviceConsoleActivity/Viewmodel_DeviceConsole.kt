@@ -22,6 +22,8 @@ import kotlinx.coroutines.withContext
 class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(application), MessageManager_interface, SocketManager_Interface, BroadcastManager_interface {
     private val TAG = "MyTagViewModel" + Viewmodel_DeviceConsole::class.java.simpleName
     var textMessageList = MutableLiveData<MutableList<DataClass_MessageInfo>>()
+    var localAndrdoiID_VM = MutableLiveData<String>()
+    var targetAndroidID_VM = MutableLiveData<String>()
 
     var switchStatus = MutableLiveData<Boolean>()
     var connectSocket = MutableLiveData<BluetoothSocket>()
@@ -33,6 +35,8 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
 
     init {
         textMessageList.value = mutableListOf()
+        localAndrdoiID_VM.value = ""
+        targetAndroidID_VM.value = ""
         connectSocket.value = null
         switchStatus.value = null
         localAddress.value = ""
@@ -80,16 +84,16 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         textMessageList.value = textMessageList.value
         Log.d(TAG, "findAndUpdate_textMessageList: ${textMessageList.value}")
     }
-    //將訊息根據Address是否和本機相等來加上local，並將其放入textMessageList
-    override fun updateVM_textMessageList(randomMessageID: String,sourceAddress: String?, targetAddress: String?,message: String) {
-        Log.d(TAG, "updateVM_textMessageList: ${localAddress.value}")
+    //將訊息根據夾帶的sourceAndroidID是否和本機相等來加上local，並將其放入textMessageList
+    override fun updateVM_textMessageList(randomMessageID: String,sourceAndroidID: String?, targetAndroidID: String?,message: String) {
+        Log.d(TAG, "updateVM_textMessageList: ${localAndrdoiID_VM.value}")
         var sourceType = ""
-        if(sourceAddress == localAddress.value){
+        if(sourceAndroidID == localAndrdoiID_VM.value){
             sourceType = "local"
         }else{
             sourceType = "other"
         }
-        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAddress, targetAddress, sourceType,null, message, false, randomMessageID))
+        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAndroidID, targetAndroidID, sourceType,null, message, false, randomMessageID))
         textMessageList.value = textMessageList.value
         Log.d(TAG, "updateVM_textMessageList: ${textMessageList.value}")
     }
@@ -100,6 +104,24 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
             connectSocket.postValue(socket)
         }
     }
+
+    override suspend fun updateLocalAndrdoiID(localAndroidID: String) {
+        withContext(Dispatchers.Main){
+            Log.d(TAG, "updateLocalAndrdoiID: ${localAndroidID}")
+            localAndrdoiID_VM.value = localAndroidID
+        }
+    }
+    override suspend fun updateTargetAndroidID(targetAndroidID: String) {
+        targetAndroidID_VM.value = targetAndroidID
+    }
+    override suspend fun getLocalAndrdoiID(): String? {
+        return localAndrdoiID_VM.value
+    }
+
+    override suspend fun getTargetAndroidID(): String? {
+        return targetAndroidID_VM.value
+    }
+
     override fun updateSwitchStatus(isOn: Boolean) {
         switchStatus.value = isOn
     }

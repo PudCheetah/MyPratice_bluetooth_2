@@ -7,10 +7,14 @@ import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.pm.PackageManager
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
@@ -84,6 +88,43 @@ class SocketManager(val context: Context, val viewModel: SocketManager_Interface
                     Toast.makeText(context, "連接失敗", Toast.LENGTH_SHORT).show()
                 }
                 false
+            }
+        }
+    }
+    fun sendAuthenticationMessage(socket: BluetoothSocket?){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val message = viewModel.getLocalAndrdoiID()
+                val outputStream = socket?.outputStream
+                Log.d(TAG, "sendAuthenticationMessage: ${message}")
+                outputStream?.write(message?.toByteArray())
+                outputStream?.flush()
+            }catch (e: IOException){
+                Log.e(TAG, "Error sending message", e)
+            }
+        }
+    }
+    fun receiveAuthenticationMessage(socket: BluetoothSocket?){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                if (ActivityCompat.checkSelfPermission(context,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "receiveMessages: Permission Problem")
+                }
+                withContext(Dispatchers.Main){
+                    Toast.makeText(context, "開始監聽", Toast.LENGTH_SHORT).show()
+                }
+                val inputStream = socket?.inputStream
+                val buffer = ByteArray(1024) // 用來存儲接收的數據
+                val bytes = inputStream?.read(buffer)
+                val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
+                Log.d(TAG, "receiveAuthenticationMessage: ${message}")
+                withContext(Dispatchers.Main){
+                    viewModel.updateTargetAndroidID(message!!)
+                }
+                Log.d(TAG, "receiveAuthenticationMessage_ViewModel: ${viewModel.getTargetAndroidID()}")
+                Log.d(TAG, "Message received: $message")
+            } catch (e: IOException) {
+                Log.e(TAG, "Error receiving message", e)
             }
         }
     }

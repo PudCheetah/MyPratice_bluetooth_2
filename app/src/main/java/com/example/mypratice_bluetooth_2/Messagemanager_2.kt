@@ -75,12 +75,12 @@ class Messagemanager_2(val context: Context, val viewModel: MessageManager_inter
         }
     }
     //加工訊息
-    fun packingMessage(message: String?): String?{
+    suspend fun packingMessage(message: String?): String?{
         var processedMessage: String? = null
         val randomMessageID = UUID.randomUUID().toString()
         val splitSymbo = "|!@#|"
-        val sourceAddress = viewModel.getLocalAddress()
-        processedMessage = "${sourceAddress}" + "${splitSymbo}" + "${randomMessageID}" + "${splitSymbo}" + "${message}"
+        val localAndrdoiID = viewModel.getLocalAndrdoiID()
+        processedMessage = "${localAndrdoiID}" + "${splitSymbo}" + "${randomMessageID}" + "${splitSymbo}" + "${message}"
 
         return processedMessage
     }
