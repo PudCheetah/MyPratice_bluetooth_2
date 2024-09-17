@@ -2,7 +2,6 @@ package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
 import android.app.Application
 import android.bluetooth.BluetoothSocket
-import android.location.Address
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -54,6 +53,17 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
             }
         }
     }
+    fun addLastMessageToDatabase(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val messageList = textMessageList.value
+            messageList?.let { it ->
+                val message = it.lastOrNull()
+                message?.let {lastMessage ->
+                    myDao?.UpsertMessage(lastMessage)
+                }
+            }
+        }
+    }
     fun getViewmodelInitJob(): Job{
         return viewModelInitJob
     }
@@ -93,7 +103,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         }else{
             sourceType = "other"
         }
-        textMessageList.value?.add(DataClass_MessageInfo(null, sourceAndroidID, targetAndroidID, sourceType,null, message, false, randomMessageID))
+        textMessageList.value?.add(DataClass_MessageInfo(sourceAndroidID, targetAndroidID, sourceType,null, message, false, randomMessageID))
         textMessageList.value = textMessageList.value
         Log.d(TAG, "updateVM_textMessageList: ${textMessageList.value}")
     }

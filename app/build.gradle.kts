@@ -41,13 +41,13 @@ android {
 }
 
 dependencies {
-    testImplementation("junit:junit:4.4")
-    testImplementation ("org.mockito:mockito-core:3.11.2")
-    testImplementation ("org.mockito:mockito-inline:3.11.2")  // 用於模擬 final 類
+//    testImplementation("junit:junit:4.4")
+//    testImplementation ("org.mockito:mockito-core:3.11.2")
+//    testImplementation ("org.mockito:mockito-inline:3.11.2")  // 用於模擬 final 類
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+//    annotationProcessor("androidx.room:room-compiler:$room_version")
     // To use Kotlin Symbol Processing (KSP)
     ksp("androidx.room:room-compiler:$room_version")
 

@@ -3,13 +3,11 @@ package com.example.mypratice_bluetooth_2
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
-import android.content.ContextParams
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import org.jetbrains.annotations.TestOnly
 
 class BluetoothAction(val context: Context, val bluetoothAdapter: BluetoothAdapter, val intentLauncher: IntentLauncher) {
     private val TAG = "MyTag" + BluetoothAction::class.java.simpleName

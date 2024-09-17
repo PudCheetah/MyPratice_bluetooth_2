@@ -1,15 +1,11 @@
 package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
-import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.mypratice_bluetooth_2.BluetoothAction
 import com.example.mypratice_bluetooth_2.BroadcastManager
@@ -19,10 +15,6 @@ import com.example.mypratice_bluetooth_2.MessageManager
 import com.example.mypratice_bluetooth_2.MyBluetoothManager
 import com.example.mypratice_bluetooth_2.SocketManager
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import java.util.UUID
 
 class DeviceConsoleActivity : AppCompatActivity() {
@@ -63,7 +55,12 @@ class DeviceConsoleActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.addToDatabase()
+//        viewModel.addToDatabase()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+//        viewModel.textMessageList.value = null
     }
 
     fun checkSwitchStatus(){

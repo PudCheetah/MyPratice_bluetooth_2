@@ -4,11 +4,8 @@ import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mypratice_bluetooth_2.BluetoothAction
 import com.example.mypratice_bluetooth_2.BroadcastManager
 import com.example.mypratice_bluetooth_2.IntentLauncher

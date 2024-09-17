@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.AndroidViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mypratice_bluetooth_2.BluetoothAction
 import com.example.mypratice_bluetooth_2.MessageManager
@@ -81,6 +80,7 @@ class DeviceConsoleActivity_setupUI(
                 binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
                 binding.rvDeviceConsole.scrollToPosition((viewModel.textMessageList.value!!.size - 1))
                 binding.root.invalidate()
+                viewModel.addLastMessageToDatabase()
             }
         }
         viewModel.switchStatus.observe(activity){
