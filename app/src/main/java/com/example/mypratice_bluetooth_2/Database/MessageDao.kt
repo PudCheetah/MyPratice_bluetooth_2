@@ -12,6 +12,8 @@ interface MessageDao {
 
     @Query("select * FROM DataClass_MessageInfo")
     fun getAllMessage(): MutableList<DataClass_MessageInfo>
+    @Query("SELECT * FROM DataClass_MessageInfo WHERE sourceAndroidID = :androidID OR targetAndroidID = :androidID")
+    fun getMessageByAndroidID(androidID: String): MutableList<DataClass_MessageInfo>
 
     @Query("select * FROM DataClass_MessageInfo WHERE sourceType = :address")
     fun getAllMessageByAddress(address: String): MutableList<DataClass_MessageInfo>

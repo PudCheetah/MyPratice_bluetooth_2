@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothSocket
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.room.Dao
 import com.example.mypratice_bluetooth_2.BroadcastManager_interface
 import com.example.mypratice_bluetooth_2.Database.DataClass_BluetoothDeviceInfo
 import com.example.mypratice_bluetooth_2.Database.DataClass_MessageInfo
@@ -41,7 +42,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         localAddress.value = ""
         viewModelInitJob = CoroutineScope(Dispatchers.IO).launch {
             myDao = MessageDatabase?.getInstance(application)?.messageDao()
-            textMessageList.postValue(myDao?.getAllMessage())
+//            textMessageList.postValue(myDao?.getAllMessage())
         }
     }
 
@@ -131,6 +132,13 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     override suspend fun getTargetAndroidID(): String? {
         return targetAndroidID_VM.value
     }
+
+    override suspend fun updateVM_textMessageListFromDatabase(andrdoiID: String) {
+        withContext(Dispatchers.IO){
+            textMessageList.postValue(myDao?.getMessageByAndroidID(andrdoiID))
+        }
+    }
+
 
     override fun updateSwitchStatus(isOn: Boolean) {
         switchStatus.value = isOn

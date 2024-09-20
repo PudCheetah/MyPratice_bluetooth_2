@@ -118,6 +118,7 @@ class SocketManager(val context: Context, val viewModel: SocketManager_Interface
                 Log.d(TAG, "receiveAuthenticationMessage: ${message}")
                 withContext(Dispatchers.Main){
                     viewModel.updateTargetAndroidID(message!!)
+                    viewModel.updateVM_textMessageListFromDatabase(message)
                 }
                 Log.d(TAG, "receiveAuthenticationMessage_ViewModel: ${viewModel.getTargetAndroidID()}")
                 Log.d(TAG, "Message received: $message")
