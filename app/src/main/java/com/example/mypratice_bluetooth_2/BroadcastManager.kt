@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.mypratice_bluetooth_2.Database.DataClass_BluetoothDeviceInfo
+import com.example.mypratice_bluetooth_2.DeviceConsoleActivity.ProgressBarSet
 
 class BroadcastManager(val context: Context, val activity: AppCompatActivity, val viewModel: BroadcastManager_interface) {
     private val TAG = "MyTag" + BroadcastManager::class.java.simpleName

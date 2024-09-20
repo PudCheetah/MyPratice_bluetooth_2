@@ -16,7 +16,7 @@ class RvAdapter_mainActivity(val context: Context, val viewModel: ViewModel_Main
         val tvDeviceAddress = itemView.tvDeviceAddress
         val tvDeviceType = itemView.tvDeviceType
         val tvDeviceUUID = itemView.tvDeviceUUID
-        val rv_item_constraintLayout = itemView.rvItemConstraintLayout
+        val btn_connect = itemView.btnConnect
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRvHolder {
@@ -35,7 +35,7 @@ class RvAdapter_mainActivity(val context: Context, val viewModel: ViewModel_Main
             tvDeviceAddress.text = deviceList?.get(position)?.deviceAddress ?: "unknow deviceAddress"
             tvDeviceType.text = deviceList?.get(position)?.deviceType?.toString() ?: "unknow deviceType"
             tvDeviceUUID.text = deviceList?.get(position)?.deviceUUID ?: "unknow deviceUUID"
-            rv_item_constraintLayout.setOnClickListener {
+            btn_connect.setOnClickListener {
                 val deviceInfo = DataClass_BluetoothDeviceInfo(
                     deviceList?.get(position)?.deviceName ?: "unknow deviceName",
                     deviceList?.get(position)?.deviceAddress ?: "unknow deviceAddress",

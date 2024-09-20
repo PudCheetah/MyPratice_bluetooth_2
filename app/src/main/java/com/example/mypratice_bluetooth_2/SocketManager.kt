@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.example.mypratice_bluetooth_2.DeviceConsoleActivity.ProgressBarSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
 
-class SocketManager(val context: Context, val viewModel: SocketManager_Interface, val MY_UUID: UUID) {
+class SocketManager(val context: Context, val viewModel: SocketManager_Interface, val MY_UUID: UUID, val progressBarSet: ProgressBarSet) {
     private val TAG = "MyTag" + SocketManager::class.java.simpleName
     //建立伺服器端(優畫板)
     suspend fun createBluetoothServerSocket_2(bluetoothAdapter: BluetoothAdapter){
@@ -34,7 +35,8 @@ class SocketManager(val context: Context, val viewModel: SocketManager_Interface
                 Log.d(TAG, "createBluetoothServerSocket: Listening for connections")
                 serverSocket?.also {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "成功建立伺服器", Toast.LENGTH_SHORT).show()
+                        progressBarSet.changeProgressInfo("成功建立伺服器，等待連線中")
+                        Toast.makeText(context, "成功建立伺服器，等待連線中", Toast.LENGTH_SHORT).show()
                     }
                 }
                 clientSocket = serverSocket.accept()
@@ -42,12 +44,14 @@ class SocketManager(val context: Context, val viewModel: SocketManager_Interface
                 Log.d(TAG, "createBluetoothServerSocket: Connection accepted")
                 clientSocket?.also {
                     withContext(Dispatchers.Main) {
+                        progressBarSet.changeProgressInfo("成功連接")
                         Toast.makeText(context, "成功連接", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: IOException) {
                 Log.e(TAG, "createBluetoothServerSocket: Error occurred", e)
                 withContext(Dispatchers.Main) {
+                    progressBarSet.changeProgressInfo("伺服器端口建立失敗")
                     Toast.makeText(context, "伺服器端口建立失敗", Toast.LENGTH_SHORT).show()
                 }
             } finally {
@@ -83,6 +87,7 @@ class SocketManager(val context: Context, val viewModel: SocketManager_Interface
             } catch (e: IOException) {
                 Log.e(TAG, "createBluetoothClientSocket: Connection failed", e)
                 withContext(Dispatchers.Main) {
+                    progressBarSet.changeProgressInfo("嘗試連線中")
                     Toast.makeText(context, "連接失敗", Toast.LENGTH_SHORT).show()
                 }
                 false

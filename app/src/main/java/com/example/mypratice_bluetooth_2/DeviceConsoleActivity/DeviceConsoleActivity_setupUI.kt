@@ -14,6 +14,7 @@ import com.example.mypratice_bluetooth_2.SocketManager
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,9 +27,45 @@ class DeviceConsoleActivity_setupUI(
     private val bluetoothDevice: BluetoothDevice,
     private val viewModel: Viewmodel_DeviceConsole,
     private val messageManager: MessageManager,
-    private val bluetoothAdapter: BluetoothAdapter
+    private val bluetoothAdapter: BluetoothAdapter,
+    private val progressBarSet: ProgressBarSet
 ) {
     private val TAG = "MyTag" + DeviceConsoleActivity_setupUI::class.java.simpleName
+
+    init {
+        initializeUI()
+        progressBarSet.showAlertDialog()
+        initializeConnect()
+    }
+    private fun initializeConnect() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val startTime = System.currentTimeMillis()
+            var connected = false
+
+            while (System.currentTimeMillis() - startTime < 10000 && !connected) {
+                if (socketManager.createBluetoothClientSocket_2(bluetoothDevice) == true) {
+                    connected = true
+                    socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+                    socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                } else {
+                    delay(1000) // 等待1秒後再次嘗試
+                }
+            }
+
+            if (!connected) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(activity, "嘗試建立伺服器", Toast.LENGTH_SHORT).show()
+                }
+                socketManager.createBluetoothServerSocket_2(bluetoothAdapter)
+                socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+            }
+
+            Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
+            messageManager.receiveMessages(viewModel.connectSocket.value)
+            progressBarSet.dissmissAlertDialog()
+        }
+    }
 
 
     fun initializeUI(){
@@ -55,9 +92,6 @@ class DeviceConsoleActivity_setupUI(
     }
 
     private fun setupButton(){
-        binding.btnConnect.setOnClickListener {
-            btnAction_connect()
-        }
         binding.btnSendMessage.setOnClickListener {
             btnAction_sendMessage()
         }
@@ -92,23 +126,7 @@ class DeviceConsoleActivity_setupUI(
         binding.rvDeviceConsole.adapter = RvAdapter_deviceConsole(viewModel)
     }
 
-    private fun btnAction_connect(){
-        CoroutineScope(Dispatchers.IO).launch {
-            if(socketManager.createBluetoothClientSocket_2(bluetoothDevice) == true){
-                socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
-                socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
-            }else{
-                withContext(Dispatchers.Main){
-                    Toast.makeText(activity, "嘗試建立伺服器", Toast.LENGTH_SHORT).show()
-                }
-                socketManager.createBluetoothServerSocket_2(bluetoothAdapter)
-                socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
-                socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
-            }
-            Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
-            messageManager.receiveMessages(viewModel.connectSocket.value)
-        }
-    }
+
     private fun btnAction_sendMessage(){
         if(bluetoothAdapter.isEnabled){
             if(viewModel.connectSocket.value?.isConnected ?: false){
