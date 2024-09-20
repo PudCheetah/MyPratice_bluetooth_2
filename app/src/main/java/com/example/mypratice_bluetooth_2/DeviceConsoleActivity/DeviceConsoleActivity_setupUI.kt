@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 class DeviceConsoleActivity_setupUI(
     private val activity: DeviceConsoleActivity,
@@ -40,9 +41,11 @@ class DeviceConsoleActivity_setupUI(
     private fun initializeConnect() {
         CoroutineScope(Dispatchers.IO).launch {
             val startTime = System.currentTimeMillis()
-            var connected = false
+            var connected = viewModel.connectSocket.value?.isConnected ?: false
+            var randomTime = Random.nextInt(1000, 7000)
 
-            while (System.currentTimeMillis() - startTime < 10000 && !connected) {
+            //會在10秒內部段嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
+            while (System.currentTimeMillis() - startTime < (3000 + randomTime) && !connected!!) {
                 if (socketManager.createBluetoothClientSocket_2(bluetoothDevice) == true) {
                     connected = true
                     socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
@@ -52,7 +55,7 @@ class DeviceConsoleActivity_setupUI(
                 }
             }
 
-            if (!connected) {
+            if (!connected!!) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(activity, "嘗試建立伺服器", Toast.LENGTH_SHORT).show()
                 }

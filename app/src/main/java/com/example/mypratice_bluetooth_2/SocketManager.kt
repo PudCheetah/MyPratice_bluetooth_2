@@ -88,7 +88,7 @@ class SocketManager(val context: Context, val viewModel: SocketManager_Interface
                 Log.e(TAG, "createBluetoothClientSocket: Connection failed", e)
                 withContext(Dispatchers.Main) {
                     progressBarSet.changeProgressInfo("嘗試連線中")
-                    Toast.makeText(context, "連接失敗", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, "連接失敗", Toast.LENGTH_SHORT).show()
                 }
                 false
             }

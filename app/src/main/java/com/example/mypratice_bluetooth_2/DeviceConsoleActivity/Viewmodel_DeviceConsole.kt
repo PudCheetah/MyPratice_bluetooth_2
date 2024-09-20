@@ -69,6 +69,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         return viewModelInitJob
     }
 
+
 //    override fun addToMessageList(address: String?, sourceType: String?, time: String?, string: String) {
 //        textMessageList.value?.add(DataClass_MessageInfo(null, address,getTargetAddress(), sourceType ?: "local", time ?: null,string, null, null))
 //        textMessageList.value = textMessageList.value
