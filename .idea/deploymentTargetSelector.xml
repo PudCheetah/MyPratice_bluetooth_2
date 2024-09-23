@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-09-21T00:10:32.035192600Z">
+        <DropdownSelection timestamp="2024-09-21T11:37:41.235592800Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\winte\.android\avd\Medium_Phone_API_32_B.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\winte\.android\avd\Medium_Phone_API_32_A.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -18,7 +18,7 @@
       </SelectionState>
       <SelectionState runConfigName="MainActivity">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-09-17T20:19:20.966413900Z">
+        <DropdownSelection timestamp="2024-09-23T09:51:15.640557600Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\winte\.android\avd\Medium_Phone_API_32_B.avd" />

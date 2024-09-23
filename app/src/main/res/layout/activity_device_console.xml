@@ -114,7 +114,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_deviceType"
             app:layout_constraintVertical_bias="0.026" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_connect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -124,6 +124,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -147,6 +148,7 @@
             android:id="@+id/textInputLayout"
             android:layout_width="0dp"
             android:layout_height="62dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginBottom="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_sendMessage"

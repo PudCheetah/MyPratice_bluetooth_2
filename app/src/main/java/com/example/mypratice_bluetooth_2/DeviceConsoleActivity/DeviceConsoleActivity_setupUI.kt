@@ -10,21 +10,20 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mypratice_bluetooth_2.BluetoothAction
 import com.example.mypratice_bluetooth_2.MessageManager
-import com.example.mypratice_bluetooth_2.SocketManager
+import com.example.mypratice_bluetooth_2.SocketManager_server
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 class DeviceConsoleActivity_setupUI(
     private val activity: DeviceConsoleActivity,
     private val binding: ActivityDeviceConsoleBinding,
     private val bluetoothAction: BluetoothAction,
-    private val socketManager: SocketManager,
+    private val socketManagerServer: SocketManager_server,
     private val bluetoothDevice: BluetoothDevice,
     private val viewModel: Viewmodel_DeviceConsole,
     private val messageManager: MessageManager,
@@ -38,32 +37,26 @@ class DeviceConsoleActivity_setupUI(
         progressBarSet.showAlertDialog()
         initializeConnect()
     }
+    //初始化連線
     private fun initializeConnect() {
         CoroutineScope(Dispatchers.IO).launch {
             val startTime = System.currentTimeMillis()
-            var connected = viewModel.connectSocket.value?.isConnected ?: false
-            var randomTime = Random.nextInt(1000, 7000)
+            var randomTime = Random.nextInt(1000, 6000)
 
-            //會在10秒內部段嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
-            while (System.currentTimeMillis() - startTime < (3000 + randomTime) && !connected!!) {
-                if (socketManager.createBluetoothClientSocket_2(bluetoothDevice) == true) {
-                    connected = true
-                    socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
-                    socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+            //會在3秒內不斷嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
+            while (System.currentTimeMillis() - startTime < (4000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
+                if (socketManagerServer.createBluetoothClientSocket_2(bluetoothDevice) == true) {
+                    socketManagerServer.sendAuthenticationMessage(viewModel.connectSocket.value)
+                    socketManagerServer.receiveAuthenticationMessage(viewModel.connectSocket.value)
                 } else {
                     delay(1000) // 等待1秒後再次嘗試
                 }
             }
-
-            if (!connected!!) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(activity, "嘗試建立伺服器", Toast.LENGTH_SHORT).show()
-                }
-                socketManager.createBluetoothServerSocket_2(bluetoothAdapter)
-                socketManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
-                socketManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+            if (!(viewModel.connectSocket.value?.isConnected ?: false)) {
+                socketManagerServer.createBluetoothServerSocket_2(bluetoothAdapter)
+                socketManagerServer.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                socketManagerServer.sendAuthenticationMessage(viewModel.connectSocket.value)
             }
-
             Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
             messageManager.receiveMessages(viewModel.connectSocket.value)
             progressBarSet.dissmissAlertDialog()
@@ -71,6 +64,7 @@ class DeviceConsoleActivity_setupUI(
     }
 
 
+    //初始化UI
     fun initializeUI(){
         if (ActivityCompat.checkSelfPermission(activity,
                 Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -80,7 +74,7 @@ class DeviceConsoleActivity_setupUI(
         binding.tvDeviceAddress.text = bluetoothDevice?.address
         binding.tvDeviceType.text = bluetoothDevice?.type.toString()
         binding.tvDeviceUUID.text = bluetoothDevice?.uuids.toString()
-        activity.checkSwitchStatus()
+        checkSwitchStatus()
         CoroutineScope(Dispatchers.Main).launch {
             joinAll(viewModel.getViewmodelInitJob())
             listenterAndObserve_set()
@@ -97,6 +91,9 @@ class DeviceConsoleActivity_setupUI(
     private fun setupButton(){
         binding.btnSendMessage.setOnClickListener {
             btnAction_sendMessage()
+        }
+        binding.btnConnect.setOnClickListener {
+            btnAction_reconnect()
         }
     }
     private fun setupSwitch(){
@@ -121,7 +118,7 @@ class DeviceConsoleActivity_setupUI(
             }
         }
         viewModel.switchStatus.observe(activity){
-            activity.checkSwitchStatus()
+            checkSwitchStatus()
         }
     }
     private fun setupRV(){
@@ -147,4 +144,13 @@ class DeviceConsoleActivity_setupUI(
             Toast.makeText(activity, "請先開啟藍芽", Toast.LENGTH_SHORT).show()
         }
     }
+    private fun btnAction_reconnect(){
+        progressBarSet.showAlertDialog()
+        initializeConnect()
+    }
+    private fun checkSwitchStatus(){
+        binding.switch1.isChecked = bluetoothAdapter.isEnabled
+    }
+
+
 }

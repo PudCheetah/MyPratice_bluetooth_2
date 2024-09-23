@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -17,12 +16,8 @@ import com.example.mypratice_bluetooth_2.IntentLauncher
 import com.example.mypratice_bluetooth_2.MessageManager
 import com.example.mypratice_bluetooth_2.MyBluetoothManager
 import com.example.mypratice_bluetooth_2.R
-import com.example.mypratice_bluetooth_2.SocketManager
+import com.example.mypratice_bluetooth_2.SocketManager_server
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class DeviceConsoleActivity : AppCompatActivity() {
@@ -33,7 +28,7 @@ class DeviceConsoleActivity : AppCompatActivity() {
     private lateinit var viewModel: Viewmodel_DeviceConsole
     private lateinit var intentLauncher: IntentLauncher
     private lateinit var bluetoothAction: BluetoothAction
-    private lateinit var socketManager: SocketManager
+    private lateinit var socketManagerServer: SocketManager_server
     private lateinit var messageManager: MessageManager
     private lateinit var setupUI: DeviceConsoleActivity_setupUI
     private lateinit var broadcastManager: BroadcastManager
@@ -51,11 +46,11 @@ class DeviceConsoleActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(Viewmodel_DeviceConsole::class.java)
         viewModel.localAddress.value = bluetoothAdapter.address
         viewModel.localAndrdoiID_VM.value = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
-        socketManager = SocketManager(this, viewModel, MY_UUID, progressBarSet)
+        socketManagerServer = SocketManager_server(this, viewModel, MY_UUID, progressBarSet)
         messageManager = MessageManager(this, viewModel)
         bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
 
-        setupUI = DeviceConsoleActivity_setupUI(this, binding, bluetoothAction, socketManager, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet)
+        setupUI = DeviceConsoleActivity_setupUI(this, binding, bluetoothAction, socketManagerServer, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet)
         broadcastManager = BroadcastManager(this, this, viewModel)
         binding.fab2.setOnClickListener {
             Log.d(TAG, "testFAB: ${viewModel.localAndrdoiID_VM.value} , ${viewModel.targetAndroidID_VM.value}")
@@ -73,9 +68,7 @@ class DeviceConsoleActivity : AppCompatActivity() {
 //        viewModel.textMessageList.value = null
     }
 
-    fun checkSwitchStatus(){
-        binding.switch1.isChecked = bluetoothAdapter.isEnabled
-    }
+
     fun alertDialogSet(){
         var display = windowManager.defaultDisplay
         val width = display.width
