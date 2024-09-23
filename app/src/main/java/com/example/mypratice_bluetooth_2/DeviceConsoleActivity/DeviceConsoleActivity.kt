@@ -16,6 +16,7 @@ import com.example.mypratice_bluetooth_2.IntentLauncher
 import com.example.mypratice_bluetooth_2.MessageManager
 import com.example.mypratice_bluetooth_2.MyBluetoothManager
 import com.example.mypratice_bluetooth_2.R
+import com.example.mypratice_bluetooth_2.SocketManager_client
 import com.example.mypratice_bluetooth_2.SocketManager_server
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import java.util.UUID
@@ -29,6 +30,7 @@ class DeviceConsoleActivity : AppCompatActivity() {
     private lateinit var intentLauncher: IntentLauncher
     private lateinit var bluetoothAction: BluetoothAction
     private lateinit var socketManagerServer: SocketManager_server
+    private lateinit var socketManagerClient: SocketManager_client
     private lateinit var messageManager: MessageManager
     private lateinit var setupUI: DeviceConsoleActivity_setupUI
     private lateinit var broadcastManager: BroadcastManager
@@ -47,10 +49,11 @@ class DeviceConsoleActivity : AppCompatActivity() {
         viewModel.localAddress.value = bluetoothAdapter.address
         viewModel.localAndrdoiID_VM.value = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
         socketManagerServer = SocketManager_server(this, viewModel, MY_UUID, progressBarSet)
+        socketManagerClient = SocketManager_client(this, viewModel, MY_UUID, progressBarSet)
         messageManager = MessageManager(this, viewModel)
         bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
 
-        setupUI = DeviceConsoleActivity_setupUI(this, binding, bluetoothAction, socketManagerServer, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet)
+        setupUI = DeviceConsoleActivity_setupUI(this, binding, bluetoothAction, socketManagerServer, socketManagerClient, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet)
         broadcastManager = BroadcastManager(this, this, viewModel)
         binding.fab2.setOnClickListener {
             Log.d(TAG, "testFAB: ${viewModel.localAndrdoiID_VM.value} , ${viewModel.targetAndroidID_VM.value}")

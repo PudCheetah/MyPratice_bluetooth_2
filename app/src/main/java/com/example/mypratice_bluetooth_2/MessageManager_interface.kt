@@ -12,4 +12,6 @@ interface MessageManager_interface {
     fun updateVM_textMessageList(randomMessageID: String,sourceAddress: String?, targetAddress: String?,message: String)
     suspend fun getLocalAndrdoiID(): String?
     suspend fun getTargetAndroidID(): String?
+    suspend fun updateVM_textMessageListFromDatabase(andrdoiID: String)
+    suspend fun updateTargetAndroidID(targetAndroidID: String)
 }

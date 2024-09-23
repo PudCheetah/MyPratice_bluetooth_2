@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mypratice_bluetooth_2.BluetoothAction
 import com.example.mypratice_bluetooth_2.MessageManager
+import com.example.mypratice_bluetooth_2.SocketManager_client
 import com.example.mypratice_bluetooth_2.SocketManager_server
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,7 @@ class DeviceConsoleActivity_setupUI(
     private val binding: ActivityDeviceConsoleBinding,
     private val bluetoothAction: BluetoothAction,
     private val socketManagerServer: SocketManager_server,
+    private val socketmanagerClient: SocketManager_client,
     private val bluetoothDevice: BluetoothDevice,
     private val viewModel: Viewmodel_DeviceConsole,
     private val messageManager: MessageManager,
@@ -45,17 +47,17 @@ class DeviceConsoleActivity_setupUI(
 
             //會在3秒內不斷嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
             while (System.currentTimeMillis() - startTime < (4000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
-                if (socketManagerServer.createBluetoothClientSocket_2(bluetoothDevice) == true) {
-                    socketManagerServer.sendAuthenticationMessage(viewModel.connectSocket.value)
-                    socketManagerServer.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                if (socketmanagerClient.createBluetoothClientSocket_2(bluetoothDevice) == true) {
+                    messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+                    messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
                 } else {
                     delay(1000) // 等待1秒後再次嘗試
                 }
             }
             if (!(viewModel.connectSocket.value?.isConnected ?: false)) {
                 socketManagerServer.createBluetoothServerSocket_2(bluetoothAdapter)
-                socketManagerServer.receiveAuthenticationMessage(viewModel.connectSocket.value)
-                socketManagerServer.sendAuthenticationMessage(viewModel.connectSocket.value)
+                messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
             }
             Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
             messageManager.receiveMessages(viewModel.connectSocket.value)

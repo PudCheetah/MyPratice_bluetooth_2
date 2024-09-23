@@ -86,42 +86,4 @@ class SocketManager_server(val context: Context, val viewModel: SocketManager_In
             }
         }
     }
-    fun sendAuthenticationMessage(socket: BluetoothSocket?){
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val message = viewModel.getLocalAndrdoiID()
-                val outputStream = socket?.outputStream
-                Log.d(TAG, "sendAuthenticationMessage: ${message}")
-                outputStream?.write(message?.toByteArray())
-                outputStream?.flush()
-            }catch (e: IOException){
-                Log.e(TAG, "Error sending message", e)
-            }
-        }
-    }
-    fun receiveAuthenticationMessage(socket: BluetoothSocket?){
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                if (ActivityCompat.checkSelfPermission(context,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "receiveMessages: Permission Problem")
-                }
-                withContext(Dispatchers.Main){
-                    Toast.makeText(context, "開始監聽", Toast.LENGTH_SHORT).show()
-                }
-                val inputStream = socket?.inputStream
-                val buffer = ByteArray(1024) // 用來存儲接收的數據
-                val bytes = inputStream?.read(buffer)
-                val message = bytes?.let { String(buffer, 0, it) } // 將數據轉換為字符串
-                Log.d(TAG, "receiveAuthenticationMessage: ${message}")
-                withContext(Dispatchers.Main){
-                    viewModel.updateTargetAndroidID(message!!)
-                    viewModel.updateVM_textMessageListFromDatabase(message)
-                }
-                Log.d(TAG, "receiveAuthenticationMessage_ViewModel: ${viewModel.getTargetAndroidID()}")
-                Log.d(TAG, "Message received: $message")
-            } catch (e: IOException) {
-                Log.e(TAG, "Error receiving message", e)
-            }
-        }
-    }
 }
