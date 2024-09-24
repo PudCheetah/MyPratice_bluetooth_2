@@ -38,10 +38,15 @@ android {
     viewBinding {
         enable = true
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
-//    testImplementation("junit:junit:4.4")
+implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.recyclerview)
+    //    testImplementation("junit:junit:4.4")
 //    testImplementation ("org.mockito:mockito-core:3.11.2")
 //    testImplementation ("org.mockito:mockito-inline:3.11.2")  // 用於模擬 final 類
 

@@ -1,4 +1,4 @@
-package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
+package com.example.mypratice_bluetooth_2.MessageFragment
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -7,9 +7,10 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mypratice_bluetooth_2.DeviceConsoleActivity.Viewmodel_DeviceConsole
 import com.example.mypratice_bluetooth_2.databinding.RvItemDeviceConsoleBinding
 
-class RvAdapter_deviceConsole(var viewModel: Viewmodel_DeviceConsole): RecyclerView.Adapter<RvAdapter_deviceConsole.MyViewHolder>(){
+class RvAdapter_MessageFragment(var viewModel: Viewmodel_DeviceConsole): RecyclerView.Adapter<RvAdapter_MessageFragment.MyViewHolder>(){
     inner class MyViewHolder(itemView: RvItemDeviceConsoleBinding): RecyclerView.ViewHolder(itemView.root){
         val tv_1_rvItem = itemView.tv1RvItem
         val cv_1_rvitem= itemView.cv1Rvitem

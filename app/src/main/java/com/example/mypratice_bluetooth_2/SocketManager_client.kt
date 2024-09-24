@@ -20,7 +20,7 @@ import java.util.UUID
 
 class SocketManager_client(val context: Context, val viewModel: SocketManager_Interface, val MY_UUID: UUID, val progressBarSet: ProgressBarSet_interface) {
     private val TAG = "MyTag" + SocketManager_server::class.java.simpleName
-    //建立客戶端(優化板)
+    //建立客戶端(ver2.4)
     suspend fun createBluetoothClientSocket_2(bluetoothDevice: BluetoothDevice): Boolean{
         return withContext(Dispatchers.IO){
             Log.d(TAG, "createBluetoothClientSocket: Starting")

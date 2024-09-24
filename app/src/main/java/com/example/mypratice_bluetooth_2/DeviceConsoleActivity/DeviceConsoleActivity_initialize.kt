@@ -7,8 +7,8 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mypratice_bluetooth_2.BluetoothAction
+import com.example.mypratice_bluetooth_2.MessageFragment.MessageFragment
 import com.example.mypratice_bluetooth_2.MessageManager
 import com.example.mypratice_bluetooth_2.SocketManager_client
 import com.example.mypratice_bluetooth_2.SocketManager_server
@@ -20,7 +20,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class DeviceConsoleActivity_setupUI(
+class DeviceConsoleActivity_initialize(
     private val activity: DeviceConsoleActivity,
     private val binding: ActivityDeviceConsoleBinding,
     private val bluetoothAction: BluetoothAction,
@@ -32,7 +32,7 @@ class DeviceConsoleActivity_setupUI(
     private val bluetoothAdapter: BluetoothAdapter,
     private val progressBarSet: ProgressBarSet
 ) {
-    private val TAG = "MyTag" + DeviceConsoleActivity_setupUI::class.java.simpleName
+    private val TAG = "MyTag" + DeviceConsoleActivity_initialize::class.java.simpleName
 
     init {
         initializeUI()
@@ -79,6 +79,7 @@ class DeviceConsoleActivity_setupUI(
         checkSwitchStatus()
         CoroutineScope(Dispatchers.Main).launch {
             joinAll(viewModel.getViewmodelInitJob())
+            setupFragment()
             listenterAndObserve_set()
         }
     }
@@ -87,7 +88,7 @@ class DeviceConsoleActivity_setupUI(
         setupButton()
         setupSwitch()
         setupObserve()
-        setupRV()
+//        setupRV()
     }
 
     private fun setupButton(){
@@ -113,9 +114,9 @@ class DeviceConsoleActivity_setupUI(
                 Toast.makeText(activity, "${viewModel.textMessageList.value?.last()}", Toast.LENGTH_SHORT).show()
             }
             CoroutineScope(Dispatchers.Main).launch{
-                binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
-                binding.rvDeviceConsole.scrollToPosition((viewModel.textMessageList.value!!.size - 1))
-                binding.root.invalidate()
+//                binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
+//                binding.rvDeviceConsole.scrollToPosition((viewModel.textMessageList.value!!.size - 1))
+//                binding.root.invalidate()
                 viewModel.addLastMessageToDatabase()
             }
         }
@@ -123,10 +124,15 @@ class DeviceConsoleActivity_setupUI(
             checkSwitchStatus()
         }
     }
-    private fun setupRV(){
-        binding.rvDeviceConsole.layoutManager = LinearLayoutManager(activity)
-        binding.rvDeviceConsole.adapter = RvAdapter_deviceConsole(viewModel)
+    private fun setupFragment(){
+        val fragmentTransation = activity.supportFragmentManager.beginTransaction()
+        fragmentTransation.replace(binding.fragmentContainerView.id, MessageFragment.instance)
+        fragmentTransation.commit()
     }
+//    private fun setupRV(){
+//        binding.rvDeviceConsole.layoutManager = LinearLayoutManager(activity)
+//        binding.rvDeviceConsole.adapter = RvAdapter_MessageFragment(viewModel)
+//    }
 
 
     private fun btnAction_sendMessage(){

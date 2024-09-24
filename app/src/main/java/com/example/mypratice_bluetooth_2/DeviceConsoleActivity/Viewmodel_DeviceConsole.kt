@@ -24,7 +24,6 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     var textMessageList = MutableLiveData<MutableList<DataClass_MessageInfo>>()
     var localAndrdoiID_VM = MutableLiveData<String>()
     var targetAndroidID_VM = MutableLiveData<String>()
-
     var switchStatus = MutableLiveData<Boolean>()
     var connectSocket = MutableLiveData<BluetoothSocket>()
     private var myDao: MessageDao? = null
@@ -68,25 +67,6 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     fun getViewmodelInitJob(): Job{
         return viewModelInitJob
     }
-
-
-//    override fun addToMessageList(address: String?, sourceType: String?, time: String?, string: String) {
-//        textMessageList.value?.add(DataClass_MessageInfo(null, address,getTargetAddress(), sourceType ?: "local", time ?: null,string, null, null))
-//        textMessageList.value = textMessageList.value
-//    }
-
-    override fun gettextMessageList(): MutableList<DataClass_MessageInfo>? {
-        return textMessageList.value
-    }
-
-    override fun getLocalAddress(): String? {
-        return localAddress.value
-    }
-
-    override fun getTargetAddressFromConnectSocket(): String? {
-        return connectSocket.value?.remoteDevice?.address
-    }
-
     //已讀功能，根據randomMessageID尋找textMessageList對應的資料並將他的reciveStatus改為true
     override fun findAndUpdate_textMessageList(randomMessageID: String?) {
         val filterString = randomMessageID
@@ -117,12 +97,6 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         }
     }
 
-    override suspend fun updateLocalAndrdoiID(localAndroidID: String) {
-        withContext(Dispatchers.Main){
-            Log.d(TAG, "updateLocalAndrdoiID: ${localAndroidID}")
-            localAndrdoiID_VM.value = localAndroidID
-        }
-    }
     override suspend fun updateTargetAndroidID(targetAndroidID: String) {
         targetAndroidID_VM.value = targetAndroidID
     }
@@ -139,8 +113,6 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
             textMessageList.postValue(myDao?.getMessageByAndroidID(andrdoiID))
         }
     }
-
-
     override fun updateSwitchStatus(isOn: Boolean) {
         switchStatus.value = isOn
     }
