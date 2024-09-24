@@ -40,7 +40,13 @@ class SocketManager_server(val context: Context, val viewModel: SocketManager_In
                         Toast.makeText(context, "成功建立伺服器，等待連線中", Toast.LENGTH_SHORT).show()
                     }
                 }
-                clientSocket = serverSocket?.accept()
+                Log.d(TAG, "Before accept()")
+                try {
+                    clientSocket = serverSocket?.accept()
+                }catch (e: IOException){
+                    Log.d(TAG, "Could not close the server socket")
+                }
+                Log.d(TAG, "After accept()")
                 viewModel.updateConnectSocket(clientSocket)
                 Log.d(TAG, "createBluetoothServerSocket: Connection accepted")
                 clientSocket?.also {
@@ -60,6 +66,14 @@ class SocketManager_server(val context: Context, val viewModel: SocketManager_In
     }
 
     fun stopSocket(){
-        serverSocket?.close()
+        try {
+            if (serverSocket != null){
+                serverSocket?.close()
+            }
+        }catch (e: IOException) {
+            Log.d(TAG, "Could not close the server socket")
+        }finally {
+            serverSocket = null
+        }
     }
 }

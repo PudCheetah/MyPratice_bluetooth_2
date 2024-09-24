@@ -8,7 +8,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.mypratice_bluetooth_2.BluetoothAction
-import com.example.mypratice_bluetooth_2.MessageFragment.MessageFragment
 import com.example.mypratice_bluetooth_2.MessageManager
 import com.example.mypratice_bluetooth_2.SocketManager_client
 import com.example.mypratice_bluetooth_2.SocketManager_server
@@ -18,6 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
 import kotlin.random.Random
 
 class DeviceConsoleActivity_initialize(
@@ -42,25 +43,33 @@ class DeviceConsoleActivity_initialize(
     //初始化連線
     private fun initializeConnect() {
         CoroutineScope(Dispatchers.IO).launch {
-            val startTime = System.currentTimeMillis()
-            var randomTime = Random.nextInt(1000, 6000)
-
-            //會在3秒內不斷嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
-            while (System.currentTimeMillis() - startTime < (4000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
-                if (socketmanagerClient.createBluetoothClientSocket_2(bluetoothDevice) == true) {
-                    messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
-                    messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
-                } else {
-                    delay(1000) // 等待1秒後再次嘗試
+//            progressBarSet.changeProgressText("")
+            while (!(viewModel.connectSocket.value?.isConnected ?: false)){
+                val startTime = System.currentTimeMillis()
+                var randomTime = Random.nextInt(1000, 6000)
+                //會在3秒內不斷嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
+                while (System.currentTimeMillis() - startTime < (4000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
+                    if (socketmanagerClient.createBluetoothClientSocket_2(bluetoothDevice) == true) {
+                        messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+                        messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                    } else {
+                        delay(1000) // 等待1秒後再次嘗試
+                    }
+                }
+                if (!(viewModel.connectSocket.value?.isConnected ?: false)) {
+                    CoroutineScope(Dispatchers.IO).launch{
+                        delay(10000)
+                        socketManagerServer.stopSocket()
+                    }
+                    socketManagerServer.createBluetoothServerSocket_2(bluetoothAdapter)
                 }
             }
-            if (!(viewModel.connectSocket.value?.isConnected ?: false)) {
-                socketManagerServer.createBluetoothServerSocket_2(bluetoothAdapter)
+            if(!(viewModel.connectSocket.value?.isConnected ?: false)){
                 messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
                 messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
             }
             Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
-            messageManager.receiveMessages(viewModel.connectSocket.value)
+//            messageManager.receiveMessages(viewModel.connectSocket.value)
             progressBarSet.dissmissAlertDialog()
         }
     }

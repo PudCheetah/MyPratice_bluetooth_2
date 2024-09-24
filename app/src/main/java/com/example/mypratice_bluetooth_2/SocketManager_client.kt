@@ -29,6 +29,9 @@ class SocketManager_client(val context: Context, val viewModel: SocketManager_In
                 return@withContext false
             }
             try {
+                withContext(Dispatchers.Main){
+                    progressBarSet.changeProgressText("嘗試以客戶端身分連線")
+                }
                 val socket: BluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID)
                 socket.connect()
                 viewModel.updateConnectSocket(socket)
@@ -39,10 +42,9 @@ class SocketManager_client(val context: Context, val viewModel: SocketManager_In
                 true
             } catch (e: IOException) {
                 Log.e(TAG, "createBluetoothClientSocket: Connection failed", e)
-                withContext(Dispatchers.Main) {
-                    progressBarSet.changeProgressText("嘗試連線中")
+//                withContext(Dispatchers.Main) {
 //                    Toast.makeText(context, "連接失敗", Toast.LENGTH_SHORT).show()
-                }
+//                }
                 false
             }
         }

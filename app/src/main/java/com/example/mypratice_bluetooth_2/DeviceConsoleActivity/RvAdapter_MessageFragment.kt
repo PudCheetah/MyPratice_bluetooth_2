@@ -1,4 +1,4 @@
-package com.example.mypratice_bluetooth_2.MessageFragment
+package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mypratice_bluetooth_2.DeviceConsoleActivity.Viewmodel_DeviceConsole
 import com.example.mypratice_bluetooth_2.databinding.RvItemDeviceConsoleBinding
 
 class RvAdapter_MessageFragment(var viewModel: Viewmodel_DeviceConsole): RecyclerView.Adapter<RvAdapter_MessageFragment.MyViewHolder>(){
