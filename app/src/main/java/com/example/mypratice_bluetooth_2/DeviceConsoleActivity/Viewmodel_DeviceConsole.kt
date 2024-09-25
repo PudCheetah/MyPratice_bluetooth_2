@@ -71,7 +71,7 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
     override fun findAndUpdate_textMessageList(randomMessageID: String?) {
         val filterString = randomMessageID
         Log.d(TAG, "findAndUpdate_textMessageListA: ${randomMessageID}")
-        Log.d(TAG, "findAndUpdate_textMessageListB: ${textMessageList.value?.last()?.randomID}")
+//        Log.d(TAG, "findAndUpdate_textMessageListB: ${textMessageList.value?.last()?.randomID}")
         textMessageList.value?.replaceAll { if (it.randomID == filterString) it.copy(reciveStatus = true)else it }
         textMessageList.value = textMessageList.value
         Log.d(TAG, "findAndUpdate_textMessageList: ${textMessageList.value}")

@@ -18,7 +18,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import kotlin.random.Random
 
 class DeviceConsoleActivity_initialize(
@@ -43,34 +42,44 @@ class DeviceConsoleActivity_initialize(
     //初始化連線
     private fun initializeConnect() {
         CoroutineScope(Dispatchers.IO).launch {
-//            progressBarSet.changeProgressText("")
-            while (!(viewModel.connectSocket.value?.isConnected ?: false)){
-                val startTime = System.currentTimeMillis()
-                var randomTime = Random.nextInt(1000, 6000)
+            val startTime = System.currentTimeMillis()
+            while (System.currentTimeMillis() - startTime < 45000 && !(viewModel.connectSocket.value?.isConnected ?: false)){
+                val innerLoopStartTime = System.currentTimeMillis()
+                var randomTime = Random.nextInt(1000, 3000)
                 //會在3秒內不斷嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
-                while (System.currentTimeMillis() - startTime < (4000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
+                while (System.currentTimeMillis() - innerLoopStartTime < (2000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
                     if (socketmanagerClient.createBluetoothClientSocket_2(bluetoothDevice) == true) {
                         messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
                         messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                        Log.d(TAG, "initializeConnect: createBluetoothClientSocket_2")
+                        break
                     } else {
                         delay(1000) // 等待1秒後再次嘗試
                     }
                 }
                 if (!(viewModel.connectSocket.value?.isConnected ?: false)) {
                     CoroutineScope(Dispatchers.IO).launch{
-                        delay(10000)
+                        delay(4000)
                         socketManagerServer.stopSocket()
                     }
-                    socketManagerServer.createBluetoothServerSocket_2(bluetoothAdapter)
+                    if(socketManagerServer.createBluetoothServerSocket_2(bluetoothAdapter) == true){
+                        messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
+                        messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+                        Log.d(TAG, "initializeConnect: createBluetoothServerSocket_2")
+                        break
+                    }
                 }
             }
-            if(!(viewModel.connectSocket.value?.isConnected ?: false)){
-                messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
-                messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
+            if(viewModel.connectSocket.value?.isConnected ?: false){
+                Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
+                messageManager.receiveMessages(viewModel.connectSocket.value)
+                progressBarSet.dissmissAlertDialog()
+            }else{
+                progressBarSet.dissmissAlertDialog()
+                withContext(Dispatchers.Main){
+                    Toast.makeText(activity, "連線逾時，請嘗試手動連線", Toast.LENGTH_LONG).show()
+                }
             }
-            Log.d(TAG, "localIDA: ${viewModel.localAndrdoiID_VM.value}, targetID: ${viewModel.targetAndroidID_VM.value}")
-//            messageManager.receiveMessages(viewModel.connectSocket.value)
-            progressBarSet.dissmissAlertDialog()
         }
     }
 
@@ -125,7 +134,7 @@ class DeviceConsoleActivity_initialize(
             CoroutineScope(Dispatchers.Main).launch{
 //                binding.rvDeviceConsole.adapter?.notifyDataSetChanged()
 //                binding.rvDeviceConsole.scrollToPosition((viewModel.textMessageList.value!!.size - 1))
-//                binding.root.invalidate()
+                binding.root.invalidate()
                 viewModel.addLastMessageToDatabase()
             }
         }

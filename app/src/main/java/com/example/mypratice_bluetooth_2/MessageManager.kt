@@ -42,22 +42,26 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
     }
     //接收訊息
     fun receiveMessages(socket: BluetoothSocket?) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                if (ActivityCompat.checkSelfPermission(context,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "receiveMessages: Permission Problem")
+        if(socket == null){
+            Log.d(TAG, "Socket is null in receiveMessages")
+        }else{
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    if (ActivityCompat.checkSelfPermission(context,Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        Log.d(TAG, "receiveMessages: Permission Problem")
+                    }
+                    withContext(Dispatchers.Main){
+                        Toast.makeText(context, "開始監聽", Toast.LENGTH_SHORT).show()
+                    }
+                    val inputStream = socket?.inputStream
+                    val buffer = ByteArray(1024) // 用來存儲接收的數據
+                    while (isActive) {
+                        // 從輸入流中讀取數據
+                        messageListener(inputStream, buffer, socket)
+                    }
+                } catch (e: IOException) {
+                    Log.e(TAG, "Error receiving message", e)
                 }
-                withContext(Dispatchers.Main){
-                    Toast.makeText(context, "開始監聽", Toast.LENGTH_SHORT).show()
-                }
-                val inputStream = socket?.inputStream
-                val buffer = ByteArray(1024) // 用來存儲接收的數據
-                while (isActive) {
-                    // 從輸入流中讀取數據
-                    messageListener(inputStream, buffer, socket)
-                }
-            } catch (e: IOException) {
-                Log.e(TAG, "Error receiving message", e)
             }
         }
     }
@@ -111,7 +115,7 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
     fun sendReply(socket: BluetoothSocket?, randomMessageID: String?){
         sendMessage(socket, randomMessageID, false)
     }
-
+    //傳送身分驗證訊息
     fun sendAuthenticationMessage(socket: BluetoothSocket?){
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -125,6 +129,7 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
             }
         }
     }
+    //接收身分驗證訊息並放入viewModel中
     fun receiveAuthenticationMessage(socket: BluetoothSocket?){
         CoroutineScope(Dispatchers.IO).launch {
             try {
