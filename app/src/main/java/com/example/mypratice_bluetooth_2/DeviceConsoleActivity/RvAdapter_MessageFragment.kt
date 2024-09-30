@@ -1,12 +1,15 @@
 package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
+import android.content.res.Resources
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mypratice_bluetooth_2.R
 import com.example.mypratice_bluetooth_2.databinding.RvItemDeviceConsoleBinding
 
 class RvAdapter_MessageFragment(var viewModel: Viewmodel_DeviceConsole): RecyclerView.Adapter<RvAdapter_MessageFragment.MyViewHolder>(){
@@ -38,7 +41,7 @@ class RvAdapter_MessageFragment(var viewModel: Viewmodel_DeviceConsole): Recycle
                 CL_set(tv_reply, (0.95).toFloat())
             }else{
                 //變更顏色
-                tv_1_rvItem.setBackgroundColor(Color.GRAY)
+                tv_1_rvItem.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.white_gray))
                 // 置左
                 CL_set(cv_1_rvitem, (0.05).toFloat())
                 CL_set(tv_source, (0).toFloat())
