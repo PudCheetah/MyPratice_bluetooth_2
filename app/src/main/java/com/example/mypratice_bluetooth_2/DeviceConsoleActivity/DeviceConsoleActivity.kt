@@ -60,13 +60,15 @@ class DeviceConsoleActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "DeviceConsoleActivity: onPause()")
         viewModel.connectSocket.value?.close()
+        viewModel.connectSocket.value = null
+//        viewModel.addToDatabase()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "DeviceConsoleActivity: onDestroy()")
+
+//        viewModel.textMessageList.value = null
     }
 
 }

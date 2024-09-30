@@ -171,6 +171,7 @@ class DeviceConsoleActivity_initialize(
         }
     }
     private fun btnAction_reconnect(){
+        viewModel.connectSocket.value?.close()
         viewModel.connectSocket.value = null
         progressBarSet.showAlertDialog()
         initializeConnect()
