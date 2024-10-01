@@ -45,7 +45,8 @@ class DeviceConsoleActivity_initialize(
             val startTime = System.currentTimeMillis()
             while (System.currentTimeMillis() - startTime < 45000 && !(viewModel.connectSocket.value?.isConnected ?: false)){
                 val innerLoopStartTime = System.currentTimeMillis()
-                var randomTime = Random.nextInt(1000, 3000)
+                val randomTimeList = listOf(0, 2000, 5000)
+                var randomTime = randomTimeList.random()
                 //會在3秒內不斷嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
                 while (System.currentTimeMillis() - innerLoopStartTime < (2000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
                     if (socketmanagerClient.createBluetoothClientSocket_2(bluetoothDevice) == true) {
