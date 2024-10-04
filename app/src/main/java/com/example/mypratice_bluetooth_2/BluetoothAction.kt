@@ -34,11 +34,11 @@ class BluetoothAction(val context: Context, val bluetoothAdapter: BluetoothAdapt
             Log.d(TAG, "activityScanning: Permission Problem")
         }
         if(bluetoothAdapter.isDiscovering){
-            Toast.makeText(context, "搜尋已開始", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, "搜尋已開始", Toast.LENGTH_SHORT).show()
             Log.d(TAG, "activityScanning: Scanning has been started")
         }else{
             if(bluetoothAdapter.startDiscovery()){
-                Toast.makeText(context, "搜尋開始", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "搜尋開始", Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "activityScanning: start scanning")
             }else{
                 Log.d(TAG, "activityScanning: scanning start Fail")

@@ -51,7 +51,7 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
                         Log.d(TAG, "receiveMessages: Permission Problem")
                     }
                     withContext(Dispatchers.Main){
-                        Toast.makeText(context, "開始監聽", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(context, "開始監聽", Toast.LENGTH_SHORT).show()
                     }
                     val inputStream = socket?.inputStream
                     val buffer = ByteArray(1024) // 用來存儲接收的數據
@@ -99,7 +99,6 @@ class MessageManager(val context: Context, val viewModel: MessageManager_interfa
             viewModel.updateVM_textMessageList(randomMessageID, sourceAndroidID, targetAndroidID, message?: "unknow")
         }
         processedMessage = "${randomMessageID}" + "${splitSymbo}" + "${sourceAndroidID}" + "${splitSymbo}" + "${targetAndroidID}" + "${splitSymbo}" + "${message}"
-
         return processedMessage
     }
     //解包訊息並輸出成串列
