@@ -18,9 +18,7 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
 
-class SocketManager_server(val context: Context, val viewModel: SocketManager_Interface,
-                           val bluetoothAdapter: BluetoothAdapter, val MY_UUID: UUID,
-                           val progressBarSet: ProgressBarSet_interface){
+class SocketManager_server(val context: Context, val viewModel: SocketManager_Interface,val bluetoothAdapter: BluetoothAdapter, val MY_UUID: UUID, val progressBarSet: ProgressBarSet_interface) {
     private val TAG = "MyTag" + SocketManager_server::class.java.simpleName
     private var serverSocket: BluetoothServerSocket? = null
     private var clientSocket: BluetoothSocket? = null
@@ -75,7 +73,6 @@ class SocketManager_server(val context: Context, val viewModel: SocketManager_In
     }
 
     fun stopSocket(){
-        Log.d(TAG, "stopSocket()")
         try {
             if (serverSocket != null){
                 serverSocket?.close()
@@ -84,7 +81,6 @@ class SocketManager_server(val context: Context, val viewModel: SocketManager_In
             Log.d(TAG, "Could not close the server socket")
         }finally {
             serverSocket = null
-            viewModel.stopSocket()
         }
     }
 }

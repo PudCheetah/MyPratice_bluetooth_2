@@ -108,10 +108,6 @@ class Viewmodel_DeviceConsole(application: Application): AndroidViewModel(applic
         return targetAndroidID_VM.value
     }
 
-    override fun stopSocket() {
-
-    }
-
     override suspend fun updateVM_textMessageListFromDatabase(andrdoiID: String) {
         withContext(Dispatchers.IO){
             textMessageList.postValue(myDao?.getMessageByAndroidID(andrdoiID))

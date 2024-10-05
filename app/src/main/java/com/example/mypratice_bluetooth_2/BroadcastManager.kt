@@ -59,11 +59,11 @@ class BroadcastManager(val context: Context, val activity: AppCompatActivity, va
         Log.d(TAG, "broadcastAction_ACTION_FOUND(ViewModel): ${viewModel.getScannedDevice()}")
     }
     fun broadcastAction_ACTION_DISCOVERY_STARTED(){
-//        Toast.makeText(context, "Discovery started", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Discovery started", Toast.LENGTH_LONG).show()
         Log.d(TAG, "Discovery started")
     }
     fun broadcastAction_ACTION_DISCOVERY_FINISHED(){
-//        Toast.makeText(context, "Discovery finished", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Discovery finished", Toast.LENGTH_LONG).show()
         Log.d(TAG, "Discovery finished")
     }
     fun broadcastAction_ACTION_STATE_CHANGED(intent: Intent){

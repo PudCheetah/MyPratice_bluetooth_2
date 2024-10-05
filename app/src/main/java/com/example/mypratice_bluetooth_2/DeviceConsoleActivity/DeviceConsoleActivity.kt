@@ -38,23 +38,19 @@ class DeviceConsoleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val deviceInfo = intent.getParcelableExtra<DataClass_BluetoothDeviceInfo>("DeviceInfo")
         bluetoothAdapter = MyBluetoothManager.bluetoothAdapter
-
+        progressBarSet = ProgressBarSet(this, this)
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceInfo?.deviceAddress)
         binding = ActivityDeviceConsoleBinding.inflate(layoutInflater)
         intentLauncher = IntentLauncher(this)
         viewModel = ViewModelProvider(this).get(Viewmodel_DeviceConsole::class.java)
         viewModel.localAddress.value = bluetoothAdapter.address
         viewModel.localAndrdoiID_VM.value = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
-        progressBarSet = ProgressBarSet(this, this)
         socketManagerServer = SocketManager_server(this, viewModel, bluetoothAdapter, MY_UUID, progressBarSet)
         socketManagerClient = SocketManager_client(this, viewModel, MY_UUID, progressBarSet)
         messageManager = MessageManager(this, viewModel)
         bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
 
         setupUI = DeviceConsoleActivity_initialize(this, binding, bluetoothAction, socketManagerServer, socketManagerClient, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet)
-        progressBarSet.setSocketCloseCallback(setupUI)
-        progressBarSet.alertDialogSet()
-        progressBarSet.showAlertDialog()
         broadcastManager = BroadcastManager(this, this, viewModel)
         binding.fab2.setOnClickListener {
             Log.d(TAG, "testFAB: ${viewModel.localAndrdoiID_VM.value} , ${viewModel.targetAndroidID_VM.value}")
@@ -64,7 +60,6 @@ class DeviceConsoleActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        setupUI.stopConnectionAttempt()
         viewModel.connectSocket.value?.close()
         viewModel.connectSocket.value = null
 //        viewModel.addToDatabase()
@@ -72,6 +67,7 @@ class DeviceConsoleActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+
 //        viewModel.textMessageList.value = null
     }
 
