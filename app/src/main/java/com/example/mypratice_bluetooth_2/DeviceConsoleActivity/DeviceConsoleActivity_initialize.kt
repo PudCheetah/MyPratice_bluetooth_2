@@ -8,12 +8,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.mypratice_bluetooth_2.BluetoothAction
+import com.example.mypratice_bluetooth_2.DeviceConsoleActivity_initializeCallBack
 import com.example.mypratice_bluetooth_2.MessageManager
 import com.example.mypratice_bluetooth_2.SocketManager_client
 import com.example.mypratice_bluetooth_2.SocketManager_server
 import com.example.mypratice_bluetooth_2.databinding.ActivityDeviceConsoleBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -31,24 +33,35 @@ class DeviceConsoleActivity_initialize(
     private val messageManager: MessageManager,
     private val bluetoothAdapter: BluetoothAdapter,
     private val progressBarSet: ProgressBarSet
-) {
+): DeviceConsoleActivity_initializeCallBack {
     private val TAG = "MyTag" + DeviceConsoleActivity_initialize::class.java.simpleName
+    private lateinit var initializeConnect_Job: Job
+    private var stopRequested = false
 
     init {
         initializeUI()
-        progressBarSet.showAlertDialog()
+//        progressBarSet.showAlertDialog()
         initializeConnect()
     }
     //初始化連線
     private fun initializeConnect() {
-        CoroutineScope(Dispatchers.IO).launch {
+        initializeConnect_Job = CoroutineScope(Dispatchers.IO).launch {
+            stopRequested = false
             val startTime = System.currentTimeMillis()
             while (System.currentTimeMillis() - startTime < 45000 && !(viewModel.connectSocket.value?.isConnected ?: false)){
                 val innerLoopStartTime = System.currentTimeMillis()
                 val randomTimeList = listOf(0, 2000, 5000)
                 var randomTime = randomTimeList.random()
+                if(stopRequested){
+                    Log.d(TAG, "Connection attempt stopped by user.")
+                    return@launch // 退出協程
+                }
                 //會在3秒內不斷嘗試"createBluetoothClientSocket_2"直到連線成功或10秒
                 while (System.currentTimeMillis() - innerLoopStartTime < (2000 + randomTime) && !(viewModel.connectSocket.value?.isConnected ?: false)) {
+                    if(stopRequested){
+                        Log.d(TAG, "Connection attempt stopped by user.")
+                        return@launch // 退出協程
+                    }
                     if (socketmanagerClient.createBluetoothClientSocket_2(bluetoothDevice) == true) {
                         messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
                         messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
@@ -58,11 +71,14 @@ class DeviceConsoleActivity_initialize(
                         delay(1000) // 等待1秒後再次嘗試
                     }
                 }
+                //若嘗試客戶端連線失敗，則建立伺服器端
                 if (!(viewModel.connectSocket.value?.isConnected ?: false)) {
+                    //生成一個計時的線呈來關閉socket
                     CoroutineScope(Dispatchers.IO).launch{
                         delay(4000)
                         socketManagerServer.stopSocket()
                     }
+                    //生成伺服器端
                     if(socketManagerServer.createBluetoothServerSocket_2(bluetoothAdapter) == true){
                         messageManager.receiveAuthenticationMessage(viewModel.connectSocket.value)
                         messageManager.sendAuthenticationMessage(viewModel.connectSocket.value)
@@ -82,6 +98,14 @@ class DeviceConsoleActivity_initialize(
                 }
             }
         }
+    }
+    //停止initializeConnect
+    override fun stopConnectionAttempt() {
+        Log.d(TAG, "stopConnectionAttempt()")
+        socketManagerServer.stopSocket()
+        progressBarSet.dissmissAlertDialog()
+        stopRequested = true
+        initializeConnect_Job?.cancel() // 停止協程
     }
 
 
@@ -174,8 +198,10 @@ class DeviceConsoleActivity_initialize(
     private fun btnAction_reconnect(){
         viewModel.connectSocket.value?.close()
         viewModel.connectSocket.value = null
-        progressBarSet.showAlertDialog()
+//        progressBarSet.showAlertDialog()
         initializeConnect()
+        progressBarSet.alertDialogSet()
+        progressBarSet.showAlertDialog()
     }
     private fun checkSwitchStatus(){
         binding.switch1.isChecked = bluetoothAdapter.isEnabled
