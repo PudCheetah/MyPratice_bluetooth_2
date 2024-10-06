@@ -1,7 +1,6 @@
 package com.example.mypratice_bluetooth_2.DeviceConsoleActivity
 
 import android.content.Context
-import android.nfc.Tag
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
@@ -9,11 +8,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
-import com.example.mypratice_bluetooth_2.DeviceConsoleActivity_initializeCallBack
 import com.example.mypratice_bluetooth_2.R
-import com.example.mypratice_bluetooth_2.SocketManager_Interface
-import com.example.mypratice_bluetooth_2.SocketManager_server
 
 class ProgressBarSet(val context: Context, val activity: AppCompatActivity): ProgressBarSet_interface {
     private val TAG = "MyTag" + ProgressBarSet::class.java.simpleName
@@ -21,16 +16,13 @@ class ProgressBarSet(val context: Context, val activity: AppCompatActivity): Pro
     private lateinit var tv_progressBarInfo: TextView
     private lateinit var cancleButton: Button
     private lateinit var alertDialog: AlertDialog
-    private lateinit var deviceConsoleActivity_initializeCallBack: DeviceConsoleActivity_initializeCallBack
+    private lateinit var initializeConnectCallBack: DeviceConsoleActivity_initializeConnect_CallBack
 
-    fun setSocketCloseCallback(callback: DeviceConsoleActivity_initializeCallBack) {
+    fun setSocketCloseCallback(callback: DeviceConsoleActivity_initializeConnect_CallBack) {
         Log.d(TAG, "setSocketCloseCallback() ")
-        this.deviceConsoleActivity_initializeCallBack = callback
-        Log.d(TAG, "setSocketCloseCallback: ${deviceConsoleActivity_initializeCallBack ?: "null"}")
+        this.initializeConnectCallBack = callback
+        Log.d(TAG, "setSocketCloseCallback: ${initializeConnectCallBack ?: "null"}")
     }
-//    init {
-//        alertDialogSet()
-//    }
 
     fun alertDialogSet(){
         Log.d(TAG, "alertDialogSet()")
@@ -47,7 +39,7 @@ class ProgressBarSet(val context: Context, val activity: AppCompatActivity): Pro
         cancleButton = alertView.findViewById(R.id.button)
         cancleButton.setOnClickListener {
             Log.d(TAG, "alertDialogSet: AlertDialog Cancle")
-            deviceConsoleActivity_initializeCallBack.stopConnectionAttempt()
+            initializeConnectCallBack.stopConnectionAttempt()
             alertDialog.dismiss()
         }
         builder.setView(alertView)

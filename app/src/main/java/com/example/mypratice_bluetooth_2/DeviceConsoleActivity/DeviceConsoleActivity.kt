@@ -29,9 +29,10 @@ class DeviceConsoleActivity : AppCompatActivity() {
     private lateinit var socketManagerServer: SocketManager_server
     private lateinit var socketManagerClient: SocketManager_client
     private lateinit var messageManager: MessageManager
-    private lateinit var setupUI: DeviceConsoleActivity_initialize
+    private lateinit var initializeUI: DeviceConsoleActivity_initializeUI
     private lateinit var broadcastManager: BroadcastManager
     private lateinit var progressBarSet: ProgressBarSet
+    private lateinit var initializeConnect: DeviceConsoleActivity_InitializeConnect
     private val MY_UUID: UUID = UUID.fromString("12345678-1234-1234-1234-123456789abc")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,11 +51,13 @@ class DeviceConsoleActivity : AppCompatActivity() {
         socketManagerClient = SocketManager_client(this, viewModel, MY_UUID, progressBarSet)
         messageManager = MessageManager(this, viewModel)
         bluetoothAction = BluetoothAction(this, bluetoothAdapter, intentLauncher)
-
-        setupUI = DeviceConsoleActivity_initialize(this, binding, bluetoothAction, socketManagerServer, socketManagerClient, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet)
-        progressBarSet.setSocketCloseCallback(setupUI)
+        initializeConnect = DeviceConsoleActivity_InitializeConnect(this, socketManagerServer, socketManagerClient, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet)
+        initializeUI = DeviceConsoleActivity_initializeUI(this, binding, bluetoothAction, bluetoothDevice, viewModel, messageManager, bluetoothAdapter, progressBarSet, initializeConnect)
+        initializeUI.initialize_UI()
+        progressBarSet.setSocketCloseCallback(initializeConnect)
         progressBarSet.alertDialogSet()
         progressBarSet.showAlertDialog()
+        initializeConnect.connectionAttempt()
         broadcastManager = BroadcastManager(this, this, viewModel)
         binding.fab2.setOnClickListener {
             Log.d(TAG, "testFAB: ${viewModel.localAndrdoiID_VM.value} , ${viewModel.targetAndroidID_VM.value}")
@@ -64,7 +67,7 @@ class DeviceConsoleActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        setupUI.stopConnectionAttempt()
+        initializeConnect.stopConnectionAttempt()
         viewModel.connectSocket.value?.close()
         viewModel.connectSocket.value = null
 //        viewModel.addToDatabase()
